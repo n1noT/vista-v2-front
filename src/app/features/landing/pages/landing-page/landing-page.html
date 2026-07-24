@@ -1,0 +1,89 @@
+<div class="rail">
+  <a class="rail__mark" href="#top">Vista</a>
+  <ul class="rail__dots">
+    <li><button type="button" (click)="scrollToSection('hero')" aria-label="Jump to top"></button></li>
+    <li><button type="button" (click)="scrollToSection('board')" aria-label="Jump to competitions"></button></li>
+    <li><button type="button" (click)="scrollToSection('how')" aria-label="Jump to how it works"></button></li>
+    <li><button type="button" (click)="scrollToSection('closing')" aria-label="Jump to sign up"></button></li>
+  </ul>
+</div>
+
+<a class="corner-link" routerLink="/login">Sign in</a>
+
+<main id="top">
+  <section class="hero" id="hero">
+    <div class="wrap">
+      <span class="hero__tag">Season 2026/27</span>
+      <h1>Predict the table. Not the highlights.</h1>
+      <p class="hero__lede">Five leagues, one Champions League — ranked before a ball is kicked, scored against the odds.</p>
+      <hr class="hero__rule">
+    </div>
+  </section>
+
+  <section class="section" id="board">
+    <div class="wrap">
+      <div class="section__head">
+        <h2>This season&rsquo;s board.</h2>
+        <p>Six competitions, six final tables to call.</p>
+      </div>
+      <table class="board tnum">
+        <tbody>
+          <tr><th>Ligue 1</th><td>Final table &middot; 18 clubs</td></tr>
+          <tr><th>Premier League</th><td>Final table &middot; 20 clubs</td></tr>
+          <tr><th>LaLiga</th><td>Final table &middot; 20 clubs</td></tr>
+          <tr><th>Bundesliga</th><td>Final table &middot; 18 clubs</td></tr>
+          <tr><th>Serie A</th><td>Final table &middot; 20 clubs</td></tr>
+          <tr><th>UEFA Champions League</th><td>League phase &amp; knockout bracket</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section" id="how">
+    <div class="wrap">
+      <div class="section__head">
+        <h2>How a season goes.</h2>
+        <p>Three stages, in order &mdash; each one closes before the next opens.</p>
+      </div>
+      <ol class="steps">
+        <li class="step sweep">
+          <span class="step__stage tnum">1.0</span>
+          <div>
+            <h3>Register.</h3>
+            <p>Pseudo, email, password. Confirm and you&rsquo;re in.</p>
+          </div>
+        </li>
+        <li class="step sweep">
+          <span class="step__stage tnum">2.0</span>
+          <div>
+            <h3>Predict.</h3>
+            <p>Drag every club into the order you think it&rsquo;ll finish, in each competition you want to play. Call the Champions League knockout ties too &mdash; full-time score, extra time included, and who wins the shoot-out if it&rsquo;s still level. Lock it in before kickoff; it&rsquo;s fixed after that.</p>
+          </div>
+        </li>
+        <li class="step sweep">
+          <span class="step__stage tnum">3.0</span>
+          <div>
+            <h3>Score.</h3>
+            <p>Fifty points for a club in its exact spot, twenty for one place off, nothing further out &mdash; multiplied by how much of a surprise that position was against the bookmakers&rsquo; own odds.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="closing" id="closing">
+    <div class="wrap closing">
+      <h2>Kickoff sets the deadline. Not us.</h2>
+      <div class="closing__actions">
+        <a class="btn" routerLink="/register">Create account</a>
+        <a class="text-link" routerLink="/login">Already playing? Sign in</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <p>Vista &mdash; five-league table predictions, scored against the bookmakers&rsquo; own odds, plus a Champions League knockout bracket. Set in Bricolage Grotesque, Newsreader, and JetBrains Mono. &copy; 2026.</p>
+    </div>
+  </footer>
+</main>

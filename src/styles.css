@@ -1,0 +1,108 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import 'tailwindcss';
+
+/**
+ * App-wide design tokens (Hallmark · Almanac, built for the landing page,
+ * now the whole app's system). Declared under @theme so Tailwind v4
+ * auto-generates utilities from them (bg-paper, text-ink, font-display,
+ * border-rule, etc.) — see any page under features/ for usage.
+ */
+@theme {
+  --color-paper:      oklch(97% 0.008 230);
+  --color-paper-2:    oklch(94% 0.010 230);
+  --color-rule:       oklch(84% 0.010 230);
+  --color-neutral:    oklch(58% 0.010 230);
+  --color-muted:      oklch(42% 0.010 230);
+  --color-ink:        oklch(20% 0.012 230);
+  --color-accent:     oklch(50% 0.15 235);
+  --color-accent-ink: oklch(98% 0.010 235);
+  --color-focus:      oklch(55% 0.17 235);
+  --color-danger:     oklch(55% 0.18 25);
+
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-body:    "Newsreader", ui-serif, Georgia, serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+@font-face {
+  font-family: "Bricolage Grotesque";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/bricolage-700.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Newsreader";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/newsreader-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Newsreader";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/newsreader-400i.woff2") format("woff2");
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/jbmono-400.woff2") format("woff2");
+}
+
+/* Dark mode: same tokens, same names — @theme values are ordinary :root
+ * custom properties at runtime, so they override the same way any would. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-paper:      oklch(15% 0.012 230);
+    --color-paper-2:    oklch(19% 0.014 230);
+    --color-rule:       oklch(30% 0.012 230);
+    --color-neutral:    oklch(62% 0.010 230);
+    --color-muted:      oklch(74% 0.008 230);
+    --color-ink:        oklch(94% 0.008 230);
+    --color-accent:     oklch(74% 0.14 235);
+    --color-accent-ink: oklch(16% 0.012 235);
+    --color-focus:      oklch(78% 0.15 235);
+    --color-danger:     oklch(72% 0.16 25);
+  }
+}
+:root[data-theme="dark"] {
+  --color-paper:      oklch(15% 0.012 230);
+  --color-paper-2:    oklch(19% 0.014 230);
+  --color-rule:       oklch(30% 0.012 230);
+  --color-neutral:    oklch(62% 0.010 230);
+  --color-muted:      oklch(74% 0.008 230);
+  --color-ink:        oklch(94% 0.008 230);
+  --color-accent:     oklch(74% 0.14 235);
+  --color-accent-ink: oklch(16% 0.012 235);
+  --color-focus:      oklch(78% 0.15 235);
+  --color-danger:     oklch(72% 0.16 25);
+}
+:root[data-theme="light"] {
+  --color-paper:      oklch(97% 0.008 230);
+  --color-paper-2:    oklch(94% 0.010 230);
+  --color-rule:       oklch(84% 0.010 230);
+  --color-neutral:    oklch(58% 0.010 230);
+  --color-muted:      oklch(42% 0.010 230);
+  --color-ink:        oklch(20% 0.012 230);
+  --color-accent:     oklch(50% 0.15 235);
+  --color-accent-ink: oklch(98% 0.010 235);
+  --color-focus:      oklch(55% 0.17 235);
+  --color-danger:     oklch(55% 0.18 25);
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: clip;
+  background: var(--color-paper);
+}
+body {
+  overflow-x: clip;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}

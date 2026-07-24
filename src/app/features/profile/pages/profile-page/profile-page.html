@@ -1,0 +1,73 @@
+@if (currentUser(); as user) {
+  <div class="flex min-h-dvh flex-col justify-center bg-paper px-6 py-16">
+    <div class="mx-auto flex w-full max-w-sm flex-col gap-8">
+      <a routerLink="/" class="w-fit font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-accent">&larr; Vista</a>
+
+      <div class="flex flex-col gap-2 border-b border-rule pb-6">
+        <h1 class="font-display text-3xl font-bold text-ink">My profile</h1>
+      </div>
+
+      @if (!editing()) {
+        <div class="flex flex-col gap-6">
+          <dl class="flex flex-col">
+            <div class="flex items-baseline justify-between gap-4 border-t border-rule py-3">
+              <dt class="font-mono text-xs uppercase tracking-widest text-muted">Pseudo</dt>
+              <dd class="font-body text-ink">{{ user.pseudo }}</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-4 border-t border-rule py-3">
+              <dt class="font-mono text-xs uppercase tracking-widest text-muted">Email</dt>
+              <dd class="font-body text-ink">{{ user.email }}</dd>
+            </div>
+          </dl>
+          <button
+            type="button"
+            (click)="startEditing()"
+            class="w-fit border border-rule px-4 py-2 font-mono text-sm text-ink transition-colors hover:border-accent hover:text-accent"
+          >
+            Edit pseudo
+          </button>
+        </div>
+      } @else {
+        <form [formGroup]="form" (ngSubmit)="save()" class="flex flex-col gap-5">
+          <label class="flex flex-col gap-1.5">
+            <span class="font-mono text-xs uppercase tracking-widest text-muted">Pseudo</span>
+            <input
+              type="text"
+              formControlName="pseudo"
+              class="border border-rule bg-paper-2 px-3 py-2.5 text-ink outline-none transition-colors focus:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            />
+          </label>
+
+          @if (errorMessage()) {
+            <p class="font-mono text-sm text-danger">{{ errorMessage() }}</p>
+          }
+
+          <div class="flex gap-3">
+            <button
+              type="submit"
+              [disabled]="form.invalid || saving()"
+              class="inline-flex items-center justify-center gap-2 border border-accent bg-accent px-5 py-2.5 font-mono text-sm tracking-wide text-accent-ink transition hover:-translate-y-px hover:border-ink hover:bg-ink active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {{ saving() ? 'Saving…' : 'Save' }}
+            </button>
+            <button
+              type="button"
+              (click)="cancelEditing()"
+              class="border border-rule px-4 py-2.5 font-mono text-sm text-ink transition-colors hover:border-accent hover:text-accent"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      }
+
+      <button
+        type="button"
+        (click)="logout()"
+        class="mt-4 w-fit border-b border-rule font-mono text-sm text-muted transition-colors hover:border-accent hover:text-accent"
+      >
+        Log out
+      </button>
+    </div>
+  </div>
+}
