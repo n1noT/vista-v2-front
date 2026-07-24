@@ -7,9 +7,15 @@
  * The rail's scroll-spy (active dot) and the step-sequence sweep-in are
  * IntersectionObserver-driven; both are wrapped in `afterNextRender` since
  * `IntersectionObserver` doesn't exist during SSR.
+ *
+ * `authService` is injected so the template can swap the "Sign in"
+ * links for a "Profile" link once a session is known to exist — this page
+ * isn't behind `authGuard`, so it calls `ensureSession()` itself to resolve
+ * that state (same cached, single-network-call check the guards use).
  */
 import { afterNextRender, Component, ElementRef, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-landing-page',
@@ -19,8 +25,10 @@ import { RouterLink } from '@angular/router';
 })
 export class LandingPage {
   private readonly elementRef: ElementRef<HTMLElement> = inject(ElementRef);
+  protected readonly authService = inject(AuthService);
 
   constructor() {
+    this.authService.ensureSession().subscribe();
     afterNextRender(() => this.setupScrollSpy());
   }
 

@@ -8,7 +8,11 @@
   </ul>
 </div>
 
-<a class="corner-link" routerLink="/login">Sign in</a>
+@if (authService.isAuthenticated()) {
+  <a class="corner-link" routerLink="/profile">Profile</a>
+} @else {
+  <a class="corner-link" routerLink="/login">Sign in</a>
+}
 
 <main id="top">
   <section class="hero" id="hero">
@@ -16,6 +20,7 @@
       <span class="hero__tag">Season 2026/27</span>
       <h1>Predict the table. Not the highlights.</h1>
       <p class="hero__lede">Five leagues, one Champions League — ranked before a ball is kicked, scored against the odds.</p>
+      <a class="btn btn--hero" routerLink="/predictions">Go to predictions hub</a>
       <hr class="hero__rule">
     </div>
   </section>
@@ -75,8 +80,12 @@
     <div class="wrap closing">
       <h2>Kickoff sets the deadline. Not us.</h2>
       <div class="closing__actions">
-        <a class="btn" routerLink="/register">Create account</a>
-        <a class="text-link" routerLink="/login">Already playing? Sign in</a>
+        @if (authService.isAuthenticated()) {
+          <a class="btn" routerLink="/profile">Go to profile</a>
+        } @else {
+          <a class="btn" routerLink="/register">Create account</a>
+          <a class="text-link" routerLink="/login">Already playing? Sign in</a>
+        }
       </div>
     </div>
   </section>

@@ -1,0 +1,57 @@
+<div class="min-h-dvh bg-paper px-6 py-16">
+  <div class="mx-auto flex w-full max-w-2xl flex-col gap-10">
+    <div class="flex items-center justify-between">
+      <a routerLink="/" class="w-fit font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-accent">&larr; Vista</a>
+      <a routerLink="/profile" class="w-fit font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-accent">Profile</a>
+    </div>
+
+    <div class="flex flex-col gap-2 border-b border-rule pb-6">
+      <h1 class="font-display text-3xl font-bold text-ink">Predictions</h1>
+      <p class="font-body text-muted">Rank the final table for each competition before it locks.</p>
+    </div>
+
+    <section class="flex flex-col gap-4">
+      <h2 class="font-mono text-xs uppercase tracking-widest text-muted">Domestic leagues</h2>
+
+      @if (leagues() === null) {
+        <p class="font-body text-muted">Loading championships&hellip;</p>
+      } @else if (errorMessage()) {
+        <p class="font-mono text-sm text-danger">{{ errorMessage() }}</p>
+      } @else if (leagues()!.length === 0) {
+        <p class="font-body text-muted">No championship is open for predictions yet — check back once the season data has synced.</p>
+      } @else {
+        <ul class="flex flex-col divide-y divide-rule border-y border-rule">
+          @for (league of leagues(); track league.leagueId) {
+            <li>
+              <a
+                [routerLink]="['/predictions/league', league.leagueId]"
+                class="flex items-center justify-between gap-4 py-4 transition-colors hover:text-accent"
+              >
+                <span class="font-body text-ink">{{ league.leagueName }}</span>
+                <span class="font-mono text-xs uppercase tracking-widest text-muted tnum">{{ league.teamCount }} clubs &rarr;</span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <section class="flex flex-col gap-4">
+      <h2 class="font-mono text-xs uppercase tracking-widest text-muted">UEFA Champions League</h2>
+      <ul class="flex flex-col divide-y divide-rule border-y border-rule">
+        <li>
+          <a routerLink="/predictions/ldc/phase-ligue" class="flex items-center justify-between gap-4 py-4 transition-colors hover:text-accent">
+            <span class="font-body text-ink">League phase</span>
+            <span class="font-mono text-xs uppercase tracking-widest text-muted">Standings &rarr;</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/predictions/ldc/phase-finale" class="flex items-center justify-between gap-4 py-4 transition-colors hover:text-accent">
+            <span class="font-body text-ink">Knockout bracket</span>
+            <span class="font-mono text-xs uppercase tracking-widest text-muted">Bracket &rarr;</span>
+          </a>
+        </li>
+      </ul>
+    </section>
+  </div>
+</div>

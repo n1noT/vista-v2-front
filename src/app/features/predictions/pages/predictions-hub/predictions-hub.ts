@@ -1,0 +1,47 @@
+/**
+ * `/predictions` hub (guarded — see `predictions.routes.ts`). Per
+ * `vista-v2-docs/02_Frontend_UI/Arborescence_Pages.md`, this page's job is
+ * just to fan a player out into the per-competition prediction pages: the
+ * five domestic leagues (`/predictions/league/[id]`) plus the two
+ * Champions League phases (`/predictions/ldc/phase-ligue|phase-finale`).
+ *
+ * The five leagues are fetched from `PredictionsService.getAvailableLeagues`
+ * (`GET /leagues`, its own `LeaguesModule` on the API), which only returns
+ * leagues that currently have `TeamLeagueSeason` rows for the season
+ * `FootballSyncService` has marked current — so this list is empty until
+ * that daily sync has run at least once. The Champions League entries are
+ * rendered as static links:
+ * the schema deliberately doesn't model CL standings yet (see
+ * `football-sync/constants.ts`), so there's no equivalent endpoint for them.
+ *
+ * None of the destination pages exist yet (see CLAUDE.md "Known issues") —
+ * the links are wired per the documented sitemap so they start working the
+ * moment those routes land, with no changes needed here.
+ */
+import { Component, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
+import { PredictionsService } from '../../predictions.service';
+import { AvailableLeague } from '../../available-league.model';
+
+@Component({
+  selector: 'app-predictions-hub',
+  imports: [RouterLink],
+  templateUrl: './predictions-hub.html',
+})
+export class PredictionsHub {
+  private readonly predictionsService = inject(PredictionsService);
+
+  protected readonly leagues = signal<AvailableLeague[] | null>(null);
+  protected readonly errorMessage = signal<string | null>(null);
+
+  constructor() {
+    this.predictionsService.getAvailableLeagues().subscribe({
+      next: (leagues) => this.leagues.set(leagues),
+      error: (err: HttpErrorResponse) => {
+        this.leagues.set([]);
+        this.errorMessage.set(err.status === 0 ? 'Could not reach the server.' : 'Could not load championships.');
+      },
+    });
+  }
+}

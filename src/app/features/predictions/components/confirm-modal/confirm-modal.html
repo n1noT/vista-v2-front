@@ -1,0 +1,37 @@
+@if (open()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 px-6"
+    (click)="cancelled.emit()"
+    (keydown.escape)="cancelled.emit()"
+  >
+    <div
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="title()"
+      (click)="$event.stopPropagation()"
+      class="flex w-full max-w-sm flex-col gap-6 border border-rule bg-paper p-6"
+    >
+      <div class="flex flex-col gap-2">
+        <h2 class="font-display text-lg font-bold text-ink">{{ title() }}</h2>
+        <p class="font-body text-muted">{{ message() }}</p>
+      </div>
+
+      <div class="flex justify-end gap-3">
+        <button
+          type="button"
+          (click)="cancelled.emit()"
+          class="border border-rule px-4 py-2.5 font-mono text-sm text-ink transition-colors hover:border-accent hover:text-accent"
+        >
+          {{ cancelLabel() }}
+        </button>
+        <button
+          type="button"
+          (click)="confirmed.emit()"
+          class="inline-flex items-center justify-center gap-2 border border-accent bg-accent px-5 py-2.5 font-mono text-sm tracking-wide text-accent-ink transition hover:-translate-y-px hover:border-ink hover:bg-ink active:translate-y-0"
+        >
+          {{ confirmLabel() }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
