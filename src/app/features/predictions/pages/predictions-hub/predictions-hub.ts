@@ -6,11 +6,13 @@
  * Champions League phases (`/predictions/ldc/phase-ligue|phase-finale`).
  *
  * The five leagues are fetched from `PredictionsService.getAvailableLeagues`
- * (`GET /leagues`, its own `LeaguesModule` on the API), which only returns
- * leagues that currently have `TeamLeagueSeason` rows for the season
- * `FootballSyncService` has marked current — so this list is empty until
- * that daily sync has run at least once. The Champions League entries are
- * rendered as static links:
+ * (`GET /predictions/leagues`, `PredictionsController` on the API), which
+ * only returns leagues that currently have `TeamLeagueSeason` rows for the
+ * season `FootballSyncService` has marked current — so this list is empty
+ * until that daily sync has run at least once. Each entry's
+ * `predictionStatus` (`NOT_STARTED`/`DRAFT`/`SUBMITTED`) is rendered as a
+ * badge so a player can see at a glance which championships they've already
+ * locked in. The Champions League entries are rendered as static links:
  * the schema deliberately doesn't model CL standings yet (see
  * `football-sync/constants.ts`), so there's no equivalent endpoint for them.
  *

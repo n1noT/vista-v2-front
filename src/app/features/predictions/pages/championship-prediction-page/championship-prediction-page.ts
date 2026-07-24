@@ -5,13 +5,16 @@
  * (`/predictions/ldc/*`) are out of scope here, see CLAUDE.md.
  *
  * On navigation, resolves the route's `:id` (a `leagueId`) to a
- * `LeagueDetail` (`GET /leagues/:leagueId` — team list for the current
- * season) and the player's own `Prediction` for that league/season, if any
- * (`GET /predictions`). `teams` (the working drag-and-drop order) starts
- * from the saved prediction's item positions when one exists, falling back
- * to `LeagueDetail`'s default (real-standings) order otherwise. Reactive on
- * `route.paramMap` (not just the initial snapshot) since Angular's default
- * `RouteReuseStrategy` reuses this component across
+ * `LeagueDetail` (`GET /predictions/leagues/:leagueId` — team list for the
+ * current season) and the player's own `Prediction` for that league/season, if any
+ * (`GET /predictions`). `teams` (the working drag-and-drop *ranked* order,
+ * passed to `DraggableLeagueTable`'s `ranked` model — the unranked pool is
+ * derived inside that component from `detail.teams` minus `teams`) starts
+ * from the saved prediction's item positions when one exists, or empty
+ * otherwise — an empty prediction is *not* the same as "ranked in real
+ * standings order," so there's no fallback to `LeagueDetail`'s default
+ * order here. Reactive on `route.paramMap` (not just the initial snapshot)
+ * since Angular's default `RouteReuseStrategy` reuses this component across
  * `/predictions/league/1` → `/predictions/league/2` navigations —
  * only params change, the component instance doesn't get recreated.
  *
@@ -65,6 +68,16 @@ export class ChampionshipPredictionPage {
     return detail !== null && new Date(detail.seasonStartDate).getTime() <= Date.now();
   });
 
+  /**
+   * Only submission requires every team ranked — the API allows saving a
+   * partial draft (any subset, as long as its positions are gap-free
+   * starting at 1), so `saveDraft` doesn't gate on this.
+   */
+  protected readonly isComplete = computed(() => {
+    const detail = this.leagueDetail();
+    return detail !== null && this.teams().length === detail.teams.length;
+  });
+
   constructor() {
     this.route.paramMap
       .pipe(
@@ -95,12 +108,13 @@ export class ChampionshipPredictionPage {
 
   private orderTeams(detail: LeagueDetail, prediction: Prediction | null): LeagueTeamStanding[] {
     if (!prediction || prediction.items.length === 0) {
-      return detail.teams;
+      return [];
     }
-    const positionByTeamId = new Map(prediction.items.map((item) => [item.teamId, item.position]));
-    return [...detail.teams].sort(
-      (a, b) => (positionByTeamId.get(a.teamId) ?? a.position) - (positionByTeamId.get(b.teamId) ?? b.position),
-    );
+    const teamById = new Map(detail.teams.map((team) => [team.teamId, team]));
+    return [...prediction.items]
+      .sort((a, b) => a.position - b.position)
+      .map((item) => teamById.get(item.teamId))
+      .filter((team): team is LeagueTeamStanding => team !== undefined);
   }
 
   private buildPayload(detail: LeagueDetail): CUPredictionsPayload {
@@ -135,7 +149,7 @@ export class ChampionshipPredictionPage {
 
   protected submitDefinitively(): void {
     const detail = this.leagueDetail();
-    if (!detail || this.readOnly() || this.submitting()) {
+    if (!detail || this.readOnly() || this.submitting() || !this.isComplete()) {
       return;
     }
     this.showSubmitConfirm.set(true);

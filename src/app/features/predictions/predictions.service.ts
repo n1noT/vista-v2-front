@@ -2,10 +2,12 @@
  * API calls for the predictions feature, kept feature-local (not in
  * `core/`) since nothing outside `/predictions/*` needs them yet.
  * `getAvailableLeagues` backs the `/predictions` hub — it lists the
- * championships that currently have standings data to predict on. Hits the
- * API's `GET /leagues` (its own `LeaguesModule`, not nested under
- * `/predictions`), kept here rather than a separate front-end feature since
- * this hub is still the only consumer.
+ * championships that currently have standings data to predict on, plus each
+ * one's `predictionStatus` for the current user. Hits `GET
+ * /predictions/leagues` — leagues have no controller of their own anymore
+ * (`LeaguesService` is still a separate API-side service, but every
+ * consumer of it is a player predicting, so its HTTP surface moved under
+ * `PredictionsController`).
  *
  * `getLeagueDetail`/`getOwnPrediction`/`saveDraft`/`submit` back the
  * `/predictions/league/[id]` form: the first two fetch what's needed to
@@ -27,11 +29,11 @@ export class PredictionsService {
   private readonly http = inject(HttpClient);
 
   getAvailableLeagues(): Observable<AvailableLeague[]> {
-    return this.http.get<AvailableLeague[]>(`${environment.apiUrl}/leagues`);
+    return this.http.get<AvailableLeague[]>(`${environment.apiUrl}/predictions/leagues`);
   }
 
   getLeagueDetail(leagueId: number): Observable<LeagueDetail> {
-    return this.http.get<LeagueDetail>(`${environment.apiUrl}/leagues/${leagueId}`);
+    return this.http.get<LeagueDetail>(`${environment.apiUrl}/predictions/leagues/${leagueId}`);
   }
 
   getOwnPrediction(leagueId: number, seasonId: number): Observable<Prediction | null> {

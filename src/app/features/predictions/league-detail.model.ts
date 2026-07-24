@@ -1,5 +1,5 @@
 /**
- * Mirrors the API's `LeagueDetail` type (`GET /leagues/:leagueId`,
+ * Mirrors the API's `LeagueDetail` type (`GET /predictions/leagues/:leagueId`,
  * `vista-v2-api/src/modules/leagues/types/league-detail.type.ts`)
  * field-for-field — the full team list for a league's current season, used
  * to seed the `DraggableLeagueTable` on `/predictions/league/[id]`.

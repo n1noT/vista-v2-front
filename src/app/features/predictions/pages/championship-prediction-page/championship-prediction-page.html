@@ -17,7 +17,7 @@
           }
           <h1 class="font-display text-3xl font-bold text-ink">{{ detail.leagueName }}</h1>
         </div>
-        <p class="font-body text-muted">Drag teams to rank them 1st to {{ detail.teams.length }}th for the final table.</p>
+        <p class="font-body text-muted">Drag teams from the unranked list into your prediction, 1st to {{ detail.teams.length }}th.</p>
       </div>
 
       @if (readOnly()) {
@@ -30,7 +30,12 @@
         </p>
       }
 
-      <app-draggable-league-table [(teams)]="teams" [readOnly]="readOnly()" />
+      <app-draggable-league-table
+        [allTeams]="detail.teams"
+        [(ranked)]="teams"
+        [readOnly]="readOnly()"
+        [hidePool]="prediction()?.status === 'SUBMITTED'"
+      />
 
       @if (statusMessage()) {
         <p class="font-mono text-sm text-accent">{{ statusMessage() }}</p>
@@ -41,23 +46,28 @@
 
       @if (!readOnly()) {
         <div class="fixed inset-x-0 bottom-0 border-t border-rule bg-paper px-6 py-4">
-          <div class="mx-auto flex w-full max-w-2xl gap-3">
-            <button
-              type="button"
-              (click)="saveDraft()"
-              [disabled]="saving() || submitting()"
-              class="border border-rule px-4 py-2.5 font-mono text-sm text-ink transition-colors hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {{ saving() ? 'Saving…' : 'Save draft' }}
-            </button>
-            <button
-              type="button"
-              (click)="submitDefinitively()"
-              [disabled]="saving() || submitting()"
-              class="inline-flex items-center justify-center gap-2 border border-accent bg-accent px-5 py-2.5 font-mono text-sm tracking-wide text-accent-ink transition hover:-translate-y-px hover:border-ink hover:bg-ink active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {{ submitting() ? 'Submitting…' : 'Submit definitively' }}
-            </button>
+          <div class="mx-auto flex w-full max-w-2xl flex-col gap-2">
+            @if (!isComplete()) {
+              <p class="font-mono text-xs uppercase tracking-widest text-muted">Rank all {{ detail.teams.length }} teams to submit — drafts can be saved partway.</p>
+            }
+            <div class="flex gap-3">
+              <button
+                type="button"
+                (click)="saveDraft()"
+                [disabled]="saving() || submitting()"
+                class="border border-rule px-4 py-2.5 font-mono text-sm text-ink transition-colors hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {{ saving() ? 'Saving…' : 'Save draft' }}
+              </button>
+              <button
+                type="button"
+                (click)="submitDefinitively()"
+                [disabled]="saving() || submitting() || !isComplete()"
+                class="inline-flex items-center justify-center gap-2 border border-accent bg-accent px-5 py-2.5 font-mono text-sm tracking-wide text-accent-ink transition hover:-translate-y-px hover:border-ink hover:bg-ink active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {{ submitting() ? 'Submitting…' : 'Submit definitively' }}
+              </button>
+            </div>
           </div>
         </div>
       }

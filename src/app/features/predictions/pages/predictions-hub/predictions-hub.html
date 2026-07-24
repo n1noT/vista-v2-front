@@ -27,7 +27,14 @@
                 [routerLink]="['/predictions/league', league.leagueId]"
                 class="flex items-center justify-between gap-4 py-4 transition-colors hover:text-accent"
               >
-                <span class="font-body text-ink">{{ league.leagueName }}</span>
+                <span class="flex items-center gap-3">
+                  <span class="font-body text-ink">{{ league.leagueName }}</span>
+                  @if (league.predictionStatus === 'SUBMITTED') {
+                    <span class="border border-accent px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-accent">Submitted</span>
+                  } @else if (league.predictionStatus === 'DRAFT') {
+                    <span class="border border-rule px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-muted">Draft</span>
+                  }
+                </span>
                 <span class="font-mono text-xs uppercase tracking-widest text-muted tnum">{{ league.teamCount }} clubs &rarr;</span>
               </a>
             </li>

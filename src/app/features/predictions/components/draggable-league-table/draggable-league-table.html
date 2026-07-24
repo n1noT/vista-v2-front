@@ -1,42 +1,62 @@
-<ul
-  cdkDropList
-  [cdkDropListDisabled]="readOnly()"
-  (cdkDropListDropped)="drop($event)"
-  class="flex flex-col divide-y divide-rule border-y border-rule"
->
-  @for (team of teams(); track team.teamId; let i = $index) {
-    <li
-      cdkDrag
-      [cdkDragDisabled]="readOnly()"
-      [class]="readOnly() ? 'flex items-center gap-4 bg-paper py-3 pr-4' : 'flex items-center gap-4 bg-paper py-3 pr-4 cursor-grab active:cursor-grabbing'"
+<div [class]="hidePool() ? 'grid grid-cols-1 gap-6' : 'grid grid-cols-1 gap-6 sm:grid-cols-2'">
+  <section class="flex flex-col gap-3" [class.hidden]="hidePool()">
+    <h3 class="font-mono text-xs uppercase tracking-widest text-muted">Unranked ({{ pool().length }})</h3>
+    <ul
+      #poolList="cdkDropList"
+      cdkDropList
+      [cdkDropListData]="pool()"
+      [cdkDropListConnectedTo]="[rankedList]"
+      [cdkDropListDisabled]="readOnly()"
+      (cdkDropListDropped)="dropOnPool($event)"
+      class="flex min-h-16 flex-col divide-y divide-rule border border-rule"
     >
-      @if (!readOnly()) {
-        <span
-          class="flex w-9 shrink-0 items-center justify-center text-muted transition-colors"
-          aria-hidden="true"
+      @for (team of pool(); track team.teamId) {
+        <li
+          cdkDrag
+          [cdkDragDisabled]="readOnly()"
+          [class]="readOnly() ? 'flex items-center gap-3 bg-paper px-3 py-2.5' : 'flex items-center gap-3 bg-paper px-3 py-2.5 cursor-grab active:cursor-grabbing'"
         >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">
-            <circle cx="4" cy="2" r="1.4" />
-            <circle cx="10" cy="2" r="1.4" />
-            <circle cx="4" cy="7" r="1.4" />
-            <circle cx="10" cy="7" r="1.4" />
-            <circle cx="4" cy="12" r="1.4" />
-            <circle cx="10" cy="12" r="1.4" />
-          </svg>
-        </span>
-      } @else {
-        <span class="w-9 shrink-0"></span>
+          @if (team.logoUrl) {
+            <img [src]="team.logoUrl" [alt]="team.name" class="h-5 w-5 shrink-0 object-contain" />
+          } @else {
+            <span class="h-5 w-5 shrink-0 border border-rule"></span>
+          }
+          <span class="font-body text-sm text-ink">{{ team.name }}</span>
+        </li>
+      } @empty {
+        <li class="px-3 py-4 font-body text-sm text-muted">All teams ranked.</li>
       }
+    </ul>
+  </section>
 
-      <span class="w-6 shrink-0 font-mono text-sm text-muted tnum">{{ i + 1 }}</span>
-
-      @if (team.logoUrl) {
-        <img [src]="team.logoUrl" [alt]="team.name" class="h-6 w-6 shrink-0 object-contain" />
-      } @else {
-        <span class="h-6 w-6 shrink-0 border border-rule"></span>
+  <section class="flex flex-col gap-3">
+    <h3 class="font-mono text-xs uppercase tracking-widest text-muted">Your prediction ({{ ranked().length }}/{{ allTeams().length }})</h3>
+    <ul
+      #rankedList="cdkDropList"
+      cdkDropList
+      [cdkDropListData]="ranked()"
+      [cdkDropListConnectedTo]="[poolList]"
+      [cdkDropListDisabled]="readOnly()"
+      (cdkDropListDropped)="dropOnRanked($event)"
+      class="flex min-h-16 flex-col divide-y divide-rule border border-rule"
+    >
+      @for (team of ranked(); track team.teamId; let i = $index) {
+        <li
+          cdkDrag
+          [cdkDragDisabled]="readOnly()"
+          [class]="readOnly() ? 'flex items-center gap-3 bg-paper px-3 py-2.5' : 'flex items-center gap-3 bg-paper px-3 py-2.5 cursor-grab active:cursor-grabbing'"
+        >
+          <span class="w-6 shrink-0 font-mono text-sm text-muted tnum">{{ i + 1 }}</span>
+          @if (team.logoUrl) {
+            <img [src]="team.logoUrl" [alt]="team.name" class="h-5 w-5 shrink-0 object-contain" />
+          } @else {
+            <span class="h-5 w-5 shrink-0 border border-rule"></span>
+          }
+          <span class="font-body text-sm text-ink">{{ team.name }}</span>
+        </li>
+      } @empty {
+        <li class="px-3 py-4 font-body text-sm text-muted">Drag teams here to rank them.</li>
       }
-
-      <span class="font-body text-ink">{{ team.name }}</span>
-    </li>
-  }
-</ul>
+    </ul>
+  </section>
+</div>
