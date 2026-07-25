@@ -1,18 +1,17 @@
 /**
- * `/admin/seasons/:id` (guarded by `adminGuard`). The team↔league-season
- * join half of `Fonctionnalites_Admin.md`'s "Saison" bullets: "L'admin peut
- * ajouter/supprimer une équipe à un championnat d'une saison." A `Season`
- * row isn't tied to one league in the schema (see `AdminSeasonsService`'s
- * header comment on the API), so adding a team requires picking both a
- * league and a team from the full lists (`AdminLeaguesService`/
- * `AdminTeamsService`, reused as-is from their own admin features rather
- * than duplicating list-fetching here).
+ * `/admin/seasons/:id` (guarded by `adminGuard`). The team↔season join half
+ * of `Fonctionnalites_Admin.md`'s "Saison" bullets: "L'admin peut
+ * ajouter/supprimer une équipe à un championnat d'une saison." Every
+ * `Season` belongs to exactly one `League` (`Season.leagueId`, shown in the
+ * page header via `SeasonDetail.league`), so adding a team only needs a
+ * team picker (`AdminTeamsService`, reused as-is from the teams admin
+ * feature) — there's no separate league to pick per participation anymore.
  *
  * Removing a participation (and editing its position/played games) is
- * instant, no confirmation — it's reversible (re-add the same team/league
- * pair) and only affects standings-prediction seed data, not player
- * predictions themselves (`PredictionItem.teamId` references `Team`
- * directly, not this join row).
+ * instant, no confirmation — it's reversible (re-add the same team) and
+ * only affects standings-prediction seed data, not player predictions
+ * themselves (`PredictionItem.teamId` references `Team` directly, not this
+ * join row).
  */
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -20,10 +19,8 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AdminSeasonsService } from '../../admin-seasons.service';
-import { AdminLeaguesService } from '../../../leagues/admin-leagues.service';
 import { AdminTeamsService } from '../../../teams/admin-teams.service';
 import { Participation, SeasonDetail } from '../../season.model';
-import { League } from '../../../leagues/league.model';
 import { Team } from '../../../teams/team.model';
 
 @Component({
@@ -35,19 +32,16 @@ export class AdminSeasonDetailPage {
   private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly adminSeasonsService = inject(AdminSeasonsService);
-  private readonly adminLeaguesService = inject(AdminLeaguesService);
   private readonly adminTeamsService = inject(AdminTeamsService);
 
   protected readonly seasonId = Number(this.route.snapshot.paramMap.get('id'));
   protected readonly season = signal<SeasonDetail | null>(null);
-  protected readonly leagues = signal<League[]>([]);
   protected readonly teams = signal<Team[]>([]);
   protected readonly loading = signal(true);
   protected readonly errorMessage = signal<string | null>(null);
 
   protected readonly adding = signal(false);
   protected readonly addForm = this.fb.nonNullable.group({
-    leagueId: [0, [Validators.required, Validators.min(1)]],
     teamId: [0, [Validators.required, Validators.min(1)]],
     position: [1, [Validators.required, Validators.min(1)]],
     playedGames: [0, [Validators.required, Validators.min(0)]],
@@ -166,7 +160,6 @@ export class AdminSeasonDetailPage {
         this.loading.set(false);
       },
     });
-    this.adminLeaguesService.list().subscribe((leagues) => this.leagues.set(leagues));
     this.adminTeamsService.list().subscribe((teams) => this.teams.set(teams));
   }
 }

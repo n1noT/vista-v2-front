@@ -7,6 +7,13 @@
  * (`admin-season-detail-page.ts`) for the team↔league-season join, which is
  * season-scoped rather than list-scoped.
  *
+ * Every season belongs to exactly one league (`Season.leagueId`, required),
+ * so both forms include a "Championship" picker (`AdminLeaguesService`,
+ * reused as-is from the leagues admin feature rather than duplicating
+ * list-fetching here) — there is no such thing as a season shared across
+ * leagues, matching how football-data.org's own season ids are already
+ * scoped to one competition.
+ *
  * Date fields use `<input type="date">` (`YYYY-MM-DD`), sent to the API
  * as-is — `@IsDateString()` on the API's DTOs accepts a bare calendar date
  * as valid ISO 8601, and `new Date('YYYY-MM-DD')` parses it correctly
@@ -21,7 +28,9 @@ import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AdminSeasonsService } from '../../admin-seasons.service';
+import { AdminLeaguesService } from '../../../leagues/admin-leagues.service';
 import { Season } from '../../season.model';
+import { League } from '../../../leagues/league.model';
 import { ConfirmModal } from '../../../../../shared/components/confirm-modal/confirm-modal';
 
 @Component({
@@ -32,13 +41,16 @@ import { ConfirmModal } from '../../../../../shared/components/confirm-modal/con
 export class AdminSeasonsPage {
   private readonly fb = inject(FormBuilder);
   private readonly adminSeasonsService = inject(AdminSeasonsService);
+  private readonly adminLeaguesService = inject(AdminLeaguesService);
 
   protected readonly seasons = signal<Season[]>([]);
+  protected readonly leagues = signal<League[]>([]);
   protected readonly loading = signal(true);
   protected readonly errorMessage = signal<string | null>(null);
 
   protected readonly creating = signal(false);
   protected readonly createForm = this.fb.nonNullable.group({
+    leagueId: [0, [Validators.required, Validators.min(1)]],
     startDate: ['', Validators.required],
     endDate: ['', Validators.required],
     currentMatchday: [1, [Validators.required, Validators.min(1)]],
@@ -48,6 +60,7 @@ export class AdminSeasonsPage {
   protected readonly editingId = signal<number | null>(null);
   protected readonly savingEdit = signal(false);
   protected readonly editForm = this.fb.nonNullable.group({
+    leagueId: [0, [Validators.required, Validators.min(1)]],
     startDate: ['', Validators.required],
     endDate: ['', Validators.required],
     currentMatchday: [1, [Validators.required, Validators.min(1)]],
@@ -77,7 +90,7 @@ export class AdminSeasonsPage {
       next: (season) => {
         this.seasons.update((list) => [season, ...list]);
         this.creating.set(false);
-        this.createForm.reset({ startDate: '', endDate: '', currentMatchday: 1, isCurrent: false });
+        this.createForm.reset({ leagueId: 0, startDate: '', endDate: '', currentMatchday: 1, isCurrent: false });
       },
       error: (err: HttpErrorResponse) => {
         this.creating.set(false);
@@ -90,6 +103,7 @@ export class AdminSeasonsPage {
     this.errorMessage.set(null);
     this.editingId.set(season.id);
     this.editForm.setValue({
+      leagueId: season.leagueId,
       startDate: season.startDate.slice(0, 10),
       endDate: season.endDate.slice(0, 10),
       currentMatchday: season.currentMatchday,
@@ -170,5 +184,6 @@ export class AdminSeasonsPage {
         this.loading.set(false);
       },
     });
+    this.adminLeaguesService.list().subscribe((leagues) => this.leagues.set(leagues));
   }
 }

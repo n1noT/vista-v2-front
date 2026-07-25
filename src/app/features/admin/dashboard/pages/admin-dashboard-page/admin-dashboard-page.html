@@ -2,9 +2,34 @@
   <div class="mx-auto flex w-full max-w-4xl flex-col gap-8">
     <a routerLink="/" class="w-fit font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-accent">&larr; Vista</a>
 
-    <div class="flex flex-col gap-2 border-b border-rule pb-6">
-      <h1 class="font-display text-3xl font-bold text-ink">Admin dashboard</h1>
-      <p class="font-body text-muted">Players overview and championship status.</p>
+    <div class="flex flex-wrap items-start justify-between gap-4 border-b border-rule pb-6">
+      <div class="flex flex-col gap-2">
+        <h1 class="font-display text-3xl font-bold text-ink">Admin dashboard</h1>
+        <p class="font-body text-muted">Players overview and championship status.</p>
+      </div>
+      <div class="flex flex-col items-end gap-2">
+        <button
+          type="button"
+          (click)="triggerSync()"
+          [disabled]="syncing()"
+          class="border border-accent bg-accent px-4 py-2 font-mono text-sm tracking-wide text-accent-ink transition hover:-translate-y-px hover:border-ink hover:bg-ink disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {{ syncing() ? 'Syncing…' : 'Sync now' }}
+        </button>
+        @if (syncError()) {
+          <p class="font-mono text-xs text-danger">{{ syncError() }}</p>
+        } @else if (syncResult(); as result) {
+          @if (!result.configured) {
+            <p class="font-mono text-xs text-danger">FOOTBALL_DATA_API_KEY is not set.</p>
+          } @else if (result.failed.length === 0) {
+            <p class="font-mono text-xs text-accent">Synced {{ result.synced.length }} championship(s).</p>
+          } @else {
+            <p class="font-mono text-xs text-danger">
+              Synced {{ result.synced.length }}, failed {{ result.failed.length }}: {{ result.failed[0].code }} &ndash; {{ result.failed[0].error }}
+            </p>
+          }
+        }
+      </div>
     </div>
 
     @if (errorMessage()) {

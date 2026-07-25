@@ -9,6 +9,15 @@
 
     <form [formGroup]="createForm" (ngSubmit)="createSeason()" class="flex flex-wrap items-end gap-3 border border-rule bg-paper-2 p-4">
       <label class="flex flex-col gap-1.5">
+        <span class="font-mono text-xs uppercase tracking-widest text-muted">Championship</span>
+        <select formControlName="leagueId" class="border border-rule bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-accent">
+          <option [ngValue]="0" disabled>Select&hellip;</option>
+          @for (league of leagues(); track league.id) {
+            <option [ngValue]="league.id">{{ league.name }}</option>
+          }
+        </select>
+      </label>
+      <label class="flex flex-col gap-1.5">
         <span class="font-mono text-xs uppercase tracking-widest text-muted">Start date</span>
         <input type="date" formControlName="startDate" class="border border-rule bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-accent" />
       </label>
@@ -41,6 +50,7 @@
       <table class="w-full divide-y divide-rule text-left" [formGroup]="editForm">
         <thead>
           <tr class="divide-x divide-rule">
+            <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Championship</th>
             <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Window</th>
             <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Matchday</th>
             <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Current</th>
@@ -52,6 +62,14 @@
           @for (season of seasons(); track season.id) {
             @if (editingId() === season.id) {
               <tr class="divide-x divide-rule align-top">
+                <td class="p-2">
+                  <select formControlName="leagueId" class="border border-rule bg-paper-2 px-2 py-1.5 text-sm text-ink outline-none focus:border-accent">
+                    <option [ngValue]="0" disabled>Select&hellip;</option>
+                    @for (league of leagues(); track league.id) {
+                      <option [ngValue]="league.id">{{ league.name }}</option>
+                    }
+                  </select>
+                </td>
                 <td class="flex flex-col gap-1.5 p-2">
                   <input type="date" formControlName="startDate" class="border border-rule bg-paper-2 px-2 py-1.5 text-sm text-ink outline-none focus:border-accent" />
                   <input type="date" formControlName="endDate" class="border border-rule bg-paper-2 px-2 py-1.5 text-sm text-ink outline-none focus:border-accent" />
@@ -91,6 +109,12 @@
               </tr>
             } @else {
               <tr class="divide-x divide-rule">
+                <td class="flex items-center gap-3 px-3 py-2.5 font-body text-sm text-ink">
+                  @if (season.league.logoUrl) {
+                    <img [src]="season.league.logoUrl" [alt]="season.league.name" class="h-5 w-5 shrink-0 object-contain" />
+                  }
+                  {{ season.league.name }}
+                </td>
                 <td class="px-3 py-2.5 font-body text-sm text-ink">
                   {{ season.startDate | date: 'mediumDate' }} &ndash; {{ season.endDate | date: 'mediumDate' }}
                 </td>
@@ -128,7 +152,7 @@
             }
           } @empty {
             <tr>
-              <td colspan="5" class="px-3 py-6 text-center font-body text-sm text-muted">
+              <td colspan="6" class="px-3 py-6 text-center font-body text-sm text-muted">
                 {{ loading() ? 'Loading seasons…' : 'No seasons yet.' }}
               </td>
             </tr>

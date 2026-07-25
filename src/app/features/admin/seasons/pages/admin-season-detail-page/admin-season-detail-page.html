@@ -8,24 +8,19 @@
       <p class="font-mono text-sm text-danger">{{ errorMessage() }}</p>
     } @else if (season(); as detail) {
       <div class="flex flex-col gap-2 border-b border-rule pb-6">
-        <h1 class="font-display text-3xl font-bold text-ink">
-          {{ detail.startDate | date: 'mediumDate' }} &ndash; {{ detail.endDate | date: 'mediumDate' }}
-        </h1>
+        <div class="flex items-center gap-3">
+          @if (detail.league.logoUrl) {
+            <img [src]="detail.league.logoUrl" [alt]="detail.league.name" class="h-6 w-6 shrink-0 object-contain" />
+          }
+          <h1 class="font-display text-3xl font-bold text-ink">{{ detail.league.name }}</h1>
+        </div>
         <p class="font-body text-muted">
+          {{ detail.startDate | date: 'mediumDate' }} &ndash; {{ detail.endDate | date: 'mediumDate' }} &middot;
           Matchday {{ detail.currentMatchday }} &middot; {{ detail.isCurrent ? 'Current season' : 'Not current' }}
         </p>
       </div>
 
       <form [formGroup]="addForm" (ngSubmit)="addTeam()" class="flex flex-wrap items-end gap-3 border border-rule bg-paper-2 p-4">
-        <label class="flex flex-col gap-1.5">
-          <span class="font-mono text-xs uppercase tracking-widest text-muted">Championship</span>
-          <select formControlName="leagueId" class="border border-rule bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-accent">
-            <option [ngValue]="0" disabled>Select&hellip;</option>
-            @for (league of leagues(); track league.id) {
-              <option [ngValue]="league.id">{{ league.name }}</option>
-            }
-          </select>
-        </label>
         <label class="flex flex-col gap-1.5">
           <span class="font-mono text-xs uppercase tracking-widest text-muted">Team</span>
           <select formControlName="teamId" class="border border-rule bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-accent">
@@ -61,7 +56,6 @@
           <thead>
             <tr class="divide-x divide-rule">
               <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Team</th>
-              <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Championship</th>
               <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Position</th>
               <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Played</th>
               <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Actions</th>
@@ -72,7 +66,6 @@
               @if (editingId() === participation.id) {
                 <tr class="divide-x divide-rule align-top">
                   <td class="px-3 py-2.5 font-body text-sm text-ink">{{ participation.team.name }}</td>
-                  <td class="px-3 py-2.5 font-body text-sm text-ink">{{ participation.league.name }}</td>
                   <td class="p-2">
                     <input type="number" min="1" formControlName="position" class="w-20 border border-rule bg-paper-2 px-2 py-1.5 text-sm text-ink outline-none focus:border-accent" />
                   </td>
@@ -109,7 +102,6 @@
                       <span class="font-body text-sm text-ink">{{ participation.team.name }}</span>
                     </div>
                   </td>
-                  <td class="px-3 py-2.5 font-body text-sm text-ink">{{ participation.league.name }}</td>
                   <td class="px-3 py-2.5 font-mono text-sm text-ink tnum">{{ participation.position }}</td>
                   <td class="px-3 py-2.5 font-mono text-sm text-ink tnum">{{ participation.playedGames }}</td>
                   <td class="px-3 py-2.5">
@@ -135,7 +127,7 @@
               }
             } @empty {
               <tr>
-                <td colspan="5" class="px-3 py-6 text-center font-body text-sm text-muted">No teams in this season yet.</td>
+                <td colspan="4" class="px-3 py-6 text-center font-body text-sm text-muted">No teams in this season yet.</td>
               </tr>
             }
           </tbody>
