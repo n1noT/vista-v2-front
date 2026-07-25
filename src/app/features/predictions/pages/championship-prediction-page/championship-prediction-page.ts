@@ -39,7 +39,7 @@ import { PredictionsService } from '../../predictions.service';
 import { LeagueDetail, LeagueTeamStanding } from '../../league-detail.model';
 import { CUPredictionsPayload, Prediction } from '../../prediction.model';
 import { DraggableLeagueTable } from '../../components/draggable-league-table/draggable-league-table';
-import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
+import { ConfirmModal } from '../../../../shared/components/confirm-modal/confirm-modal';
 
 @Component({
   selector: 'app-championship-prediction-page',

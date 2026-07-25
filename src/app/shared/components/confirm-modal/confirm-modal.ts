@@ -1,11 +1,11 @@
 /**
  * Generic yes/no confirmation dialog, styled to the Hallmark/Almanac design
  * system (sharp corners, `border-rule`, mono buttons) — stands in for the
- * browser-native `confirm()` used by `championship-prediction-page`'s
- * "submit definitively" action, which can't be themed and reads as an
- * out-of-place OS dialog. Kept feature-local (not `shared/`) for now since
- * this page is still the only consumer, matching the convention already
- * used by `predictions.service.ts`.
+ * browser-native `confirm()`. Originally built for
+ * `championship-prediction-page`'s "submit definitively" action (which
+ * can't be themed and reads as an out-of-place OS dialog); moved here from
+ * `features/predictions/components/` once the admin players page became a
+ * second consumer (ban/delete confirmations).
  *
  * Presentational only: the parent owns `open` and reacts to `confirmed`/
  * `cancelled`, this component has no state of its own beyond rendering.

@@ -7,7 +7,10 @@
  * successful save, so re-opening the editor shows the new value). Only
  * `pseudo` is editable for now — avatar upload is deferred (see
  * `UsersController`'s comment on why). `logout()` clears the session and
- * sends the user back to `/login`.
+ * sends the user back to `/login`. An "Admin dashboard" link to `/admin`
+ * shows only for `role === 'ADMIN'` — purely a UX convenience, not a
+ * security boundary; the API's `RolesGuard` is what actually enforces it
+ * (see `AdminUsersController`/`AdminDashboardController`).
  */
 import { Component, effect, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';

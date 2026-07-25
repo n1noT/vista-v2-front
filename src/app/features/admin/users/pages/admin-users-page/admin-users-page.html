@@ -1,0 +1,145 @@
+<div class="min-h-dvh bg-paper px-6 py-16">
+  <div class="mx-auto flex w-full max-w-4xl flex-col gap-8">
+    <a routerLink="/admin" class="w-fit font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-accent">&larr; Dashboard</a>
+
+    <div class="flex flex-col gap-2 border-b border-rule pb-6">
+      <h1 class="font-display text-3xl font-bold text-ink">Players</h1>
+      <p class="font-body text-muted">Ban, edit, or delete player accounts.</p>
+    </div>
+
+    <input
+      type="search"
+      placeholder="Search by pseudo or email"
+      [value]="search()"
+      (input)="onSearch($any($event.target).value)"
+      class="w-full max-w-sm border border-rule bg-paper-2 px-3 py-2.5 text-ink outline-none transition-colors focus:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+    />
+
+    @if (errorMessage()) {
+      <p class="font-mono text-sm text-danger">{{ errorMessage() }}</p>
+    }
+
+    <div class="overflow-x-auto border border-rule">
+      <table class="w-full divide-y divide-rule text-left" [formGroup]="form">
+        <thead>
+          <tr class="divide-x divide-rule">
+            <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Pseudo</th>
+            <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Email</th>
+            <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Role</th>
+            <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Status</th>
+            <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Joined</th>
+            <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-rule">
+          @for (user of users(); track user.id) {
+            @if (editingId() === user.id) {
+              <tr class="divide-x divide-rule align-top">
+                <td class="p-2">
+                  <input
+                    formControlName="pseudo"
+                    class="w-full border border-rule bg-paper-2 px-2 py-1.5 text-sm text-ink outline-none focus:border-accent"
+                  />
+                </td>
+                <td class="p-2">
+                  <input
+                    formControlName="email"
+                    class="w-full border border-rule bg-paper-2 px-2 py-1.5 text-sm text-ink outline-none focus:border-accent"
+                  />
+                </td>
+                <td class="px-3 py-2.5 font-mono text-sm text-ink">{{ user.role }}</td>
+                <td class="px-3 py-2.5 font-mono text-sm" [class]="user.bannedAt ? 'text-danger' : 'text-ink'">
+                  {{ user.bannedAt ? 'Banned' : 'Active' }}
+                </td>
+                <td class="px-3 py-2.5 font-body text-sm text-ink">{{ user.createdAt | date: 'mediumDate' }}</td>
+                <td class="p-2">
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      (click)="save(user)"
+                      [disabled]="form.invalid || savingEdit()"
+                      class="border border-accent bg-accent px-3 py-1.5 font-mono text-xs tracking-wide text-accent-ink transition hover:-translate-y-px hover:border-ink hover:bg-ink disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {{ savingEdit() ? 'Saving…' : 'Save' }}
+                    </button>
+                    <button
+                      type="button"
+                      (click)="cancelEditing()"
+                      class="border border-rule px-3 py-1.5 font-mono text-xs text-ink transition-colors hover:border-accent hover:text-accent"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @else {
+              <tr class="divide-x divide-rule">
+                <td class="px-3 py-2.5 font-body text-sm text-ink">{{ user.pseudo }}</td>
+                <td class="px-3 py-2.5 font-body text-sm text-ink">{{ user.email }}</td>
+                <td class="px-3 py-2.5">
+                  <button
+                    type="button"
+                    (click)="toggleRole(user)"
+                    [disabled]="pendingActionId() === user.id || isSelf(user)"
+                    [title]="isSelf(user) ? 'You cannot change your own role' : 'Toggle role'"
+                    class="border-b border-dotted border-muted font-mono text-sm text-ink transition-colors hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:border-transparent disabled:opacity-50"
+                  >
+                    {{ user.role }}
+                  </button>
+                </td>
+                <td class="px-3 py-2.5 font-mono text-sm" [class]="user.bannedAt ? 'text-danger' : 'text-ink'">
+                  {{ user.bannedAt ? 'Banned' : 'Active' }}
+                </td>
+                <td class="px-3 py-2.5 font-body text-sm text-ink">{{ user.createdAt | date: 'mediumDate' }}</td>
+                <td class="px-3 py-2.5">
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      (click)="startEditing(user)"
+                      class="border border-rule px-3 py-1.5 font-mono text-xs text-ink transition-colors hover:border-accent hover:text-accent"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      (click)="toggleBan(user)"
+                      [disabled]="pendingActionId() === user.id || isSelf(user)"
+                      [title]="isSelf(user) ? 'You cannot ban your own account' : ''"
+                      class="border border-rule px-3 py-1.5 font-mono text-xs text-ink transition-colors hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {{ user.bannedAt ? 'Unban' : 'Ban' }}
+                    </button>
+                    <button
+                      type="button"
+                      (click)="confirmDelete(user)"
+                      [disabled]="pendingActionId() === user.id || isSelf(user)"
+                      [title]="isSelf(user) ? 'You cannot delete your own account' : ''"
+                      class="border border-rule px-3 py-1.5 font-mono text-xs text-danger transition-colors hover:border-danger disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          } @empty {
+            <tr>
+              <td colspan="6" class="px-3 py-6 text-center font-body text-sm text-muted">
+                {{ loading() ? 'Loading players…' : 'No players found.' }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<app-confirm-modal
+  [open]="deleteTarget() !== null"
+  title="Delete player"
+  [message]="deleteMessage()"
+  confirmLabel="Delete"
+  (confirmed)="deleteConfirmed()"
+  (cancelled)="cancelDelete()"
+/>

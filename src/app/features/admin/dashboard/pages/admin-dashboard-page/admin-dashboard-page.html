@@ -1,0 +1,77 @@
+<div class="min-h-dvh bg-paper px-6 py-16">
+  <div class="mx-auto flex w-full max-w-4xl flex-col gap-8">
+    <a routerLink="/" class="w-fit font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-accent">&larr; Vista</a>
+
+    <div class="flex flex-col gap-2 border-b border-rule pb-6">
+      <h1 class="font-display text-3xl font-bold text-ink">Admin dashboard</h1>
+      <p class="font-body text-muted">Players overview and championship status.</p>
+    </div>
+
+    @if (errorMessage()) {
+      <p class="font-mono text-sm text-danger">{{ errorMessage() }}</p>
+    } @else if (loading()) {
+      <p class="font-body text-sm text-muted">Loading…</p>
+    } @else if (overview(); as data) {
+      <div class="grid grid-cols-1 gap-px border border-rule bg-rule sm:grid-cols-3">
+        <div class="flex flex-col gap-1 bg-paper px-5 py-4">
+          <span class="font-mono text-xs uppercase tracking-widest text-muted">Players</span>
+          <span class="font-display text-3xl font-bold text-ink tnum">{{ data.players.total }}</span>
+        </div>
+        <div class="flex flex-col gap-1 bg-paper px-5 py-4">
+          <span class="font-mono text-xs uppercase tracking-widest text-muted">Active</span>
+          <span class="font-display text-3xl font-bold text-ink tnum">{{ data.players.total - data.players.banned }}</span>
+        </div>
+        <div class="flex flex-col gap-1 bg-paper px-5 py-4">
+          <span class="font-mono text-xs uppercase tracking-widest text-muted">Banned</span>
+          <span class="font-display text-3xl font-bold text-ink tnum">{{ data.players.banned }}</span>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between gap-4">
+        <h2 class="font-display text-xl font-bold text-ink">Championships</h2>
+        <a
+          routerLink="/admin/users"
+          class="border border-rule px-4 py-2 font-mono text-sm text-ink transition-colors hover:border-accent hover:text-accent"
+        >
+          Manage players
+        </a>
+      </div>
+
+      <div class="overflow-x-auto border border-rule">
+        <table class="w-full divide-y divide-rule text-left">
+          <thead>
+            <tr class="divide-x divide-rule">
+              <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Championship</th>
+              <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Matchday</th>
+              <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Teams</th>
+              <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Season window</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-rule">
+            @for (championship of data.championships; track championship.leagueId) {
+              <tr class="divide-x divide-rule">
+                <td class="flex items-center gap-3 px-3 py-2.5 font-body text-sm text-ink">
+                  @if (championship.leagueLogoUrl) {
+                    <img [src]="championship.leagueLogoUrl" [alt]="championship.leagueName" class="h-5 w-5 shrink-0 object-contain" />
+                  } @else {
+                    <span class="h-5 w-5 shrink-0 border border-rule"></span>
+                  }
+                  {{ championship.leagueName }}
+                </td>
+                <td class="px-3 py-2.5 font-mono text-sm text-ink tnum">{{ championship.currentMatchday }}</td>
+                <td class="px-3 py-2.5 font-mono text-sm text-ink tnum">{{ championship.teamCount }}</td>
+                <td class="px-3 py-2.5 font-body text-sm text-muted">
+                  {{ championship.startDate | date: 'mediumDate' }} &ndash; {{ championship.endDate | date: 'mediumDate' }}
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4" class="px-3 py-6 text-center font-body text-sm text-muted">No championships synced yet.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

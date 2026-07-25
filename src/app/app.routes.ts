@@ -1,10 +1,10 @@
 /**
  * Top-level route table. `''` is the public landing page (Hallmark-built,
- * see features/landing/). Auth, profile, and predictions are lazy-loaded via
- * `loadChildren` so their code isn't part of the initial bundle until the
- * user actually navigates there. Each is nested under its own `*Routes`
- * (rather than declared inline here) so the `authGuard` that protects it
- * lives next to the feature it protects.
+ * see features/landing/). Auth, profile, predictions, and admin are
+ * lazy-loaded via `loadChildren` so their code isn't part of the initial
+ * bundle until the user actually navigates there. Each is nested under its
+ * own `*Routes` (rather than declared inline here) so the `authGuard`/
+ * `adminGuard` that protects it lives next to the feature it protects.
  */
 import { Routes } from '@angular/router';
 
@@ -25,5 +25,9 @@ export const routes: Routes = [
   {
     path: 'predictions',
     loadChildren: () => import('./features/predictions/predictions.routes').then((m) => m.predictionsRoutes),
+  },
+  {
+    path: 'admin',
+    loadChildren: () => import('./features/admin/admin.routes').then((m) => m.adminRoutes),
   },
 ];
