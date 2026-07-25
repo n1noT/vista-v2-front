@@ -1,0 +1,47 @@
+<div class="min-h-dvh bg-paper px-6 py-16">
+  <div class="mx-auto flex w-full max-w-2xl flex-col gap-10">
+    <a routerLink="/admin/users" class="w-fit font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-accent">&larr; Players</a>
+
+    <div class="flex flex-col gap-2 border-b border-rule pb-6">
+      <h1 class="font-display text-3xl font-bold text-ink">
+        @if (player(); as p) {
+          {{ p.pseudo }}'s predictions
+        } @else {
+          Predictions
+        }
+      </h1>
+      <p class="font-body text-muted">Edit this player's standings prediction for any championship, submitted or not.</p>
+    </div>
+
+    <section class="flex flex-col gap-4">
+      @if (leagues() === null) {
+        <p class="font-body text-muted">Loading championships&hellip;</p>
+      } @else if (errorMessage()) {
+        <p class="font-mono text-sm text-danger">{{ errorMessage() }}</p>
+      } @else if (leagues()!.length === 0) {
+        <p class="font-body text-muted">No championship is open for predictions yet — check back once the season data has synced.</p>
+      } @else {
+        <ul class="flex flex-col divide-y divide-rule border-y border-rule">
+          @for (league of leagues(); track league.leagueId) {
+            <li>
+              <a
+                [routerLink]="['/admin/users', userId, 'predictions', 'league', league.leagueId]"
+                class="flex items-center justify-between gap-4 py-4 transition-colors hover:text-accent"
+              >
+                <span class="flex items-center gap-3">
+                  <span class="font-body text-ink">{{ league.leagueName }}</span>
+                  @if (league.predictionStatus === 'SUBMITTED') {
+                    <span class="border border-accent px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-accent">Submitted</span>
+                  } @else if (league.predictionStatus === 'DRAFT') {
+                    <span class="border border-rule px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-muted">Draft</span>
+                  }
+                </span>
+                <span class="font-mono text-xs uppercase tracking-widest text-muted tnum">{{ league.teamCount }} clubs &rarr;</span>
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+</div>

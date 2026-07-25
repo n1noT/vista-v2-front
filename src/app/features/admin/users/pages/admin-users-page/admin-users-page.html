@@ -100,6 +100,12 @@
                     >
                       Edit
                     </button>
+                    <a
+                      [routerLink]="['/admin/users', user.id, 'predictions']"
+                      class="border border-rule px-3 py-1.5 font-mono text-xs text-ink transition-colors hover:border-accent hover:text-accent"
+                    >
+                      Predictions
+                    </a>
                     <button
                       type="button"
                       (click)="toggleBan(user)"

@@ -29,6 +29,10 @@ export class AdminUsersService {
     return this.http.get<User[]>(this.baseUrl, { params });
   }
 
+  get(id: string): Observable<User> {
+    return this.http.get<User>(`${this.baseUrl}/${id}`);
+  }
+
   update(id: string, payload: UpdatePlayerPayload): Observable<User> {
     return this.http.patch<User>(`${this.baseUrl}/${id}`, payload);
   }

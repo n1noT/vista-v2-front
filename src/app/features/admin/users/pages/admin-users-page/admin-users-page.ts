@@ -7,8 +7,10 @@
  * for the same reason `profile-page.ts` doesn't edit it either — no upload
  * strategy yet, even though the API's `UpdateUserAdminDto` already accepts
  * it), ban/unban and role toggle (both instant — reversible, so no
- * confirmation), and delete (irreversible, gated behind the shared
- * `ConfirmModal`).
+ * confirmation), delete (irreversible, gated behind the shared
+ * `ConfirmModal`), and a "Predictions" link into
+ * `/admin/users/:id/predictions` (`features/admin/predictions/`) for
+ * editing that player's standings picks.
  *
  * `pendingActionId` tracks which row has an in-flight ban/unban/role/delete
  * call so its buttons can be disabled without blocking the rest of the
