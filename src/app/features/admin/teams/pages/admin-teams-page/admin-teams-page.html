@@ -1,0 +1,141 @@
+<div class="min-h-dvh bg-paper px-6 py-16">
+  <div class="mx-auto flex w-full max-w-3xl flex-col gap-8">
+    <a routerLink="/admin" class="w-fit font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-accent">&larr; Dashboard</a>
+
+    <div class="flex flex-col gap-2 border-b border-rule pb-6">
+      <h1 class="font-display text-3xl font-bold text-ink">Teams</h1>
+      <p class="font-body text-muted">Add, edit, or delete teams.</p>
+    </div>
+
+    <form [formGroup]="createForm" (ngSubmit)="createTeam()" class="flex flex-wrap items-end gap-3 border border-rule bg-paper-2 p-4">
+      <label class="flex flex-col gap-1.5">
+        <span class="font-mono text-xs uppercase tracking-widest text-muted">Name</span>
+        <input
+          formControlName="name"
+          class="border border-rule bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-accent"
+        />
+      </label>
+      <label class="flex flex-col gap-1.5">
+        <span class="font-mono text-xs uppercase tracking-widest text-muted">Logo URL (optional)</span>
+        <input
+          formControlName="logoUrl"
+          class="border border-rule bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-accent"
+        />
+      </label>
+      <button
+        type="submit"
+        [disabled]="createForm.invalid || creating()"
+        class="border border-accent bg-accent px-4 py-2 font-mono text-sm tracking-wide text-accent-ink transition hover:-translate-y-px hover:border-ink hover:bg-ink disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {{ creating() ? 'Adding…' : 'Add team' }}
+      </button>
+    </form>
+
+    @if (errorMessage()) {
+      <p class="font-mono text-sm text-danger">{{ errorMessage() }}</p>
+    }
+
+    <div class="overflow-x-auto border border-rule">
+      <table class="w-full divide-y divide-rule text-left" [formGroup]="editForm">
+        <thead>
+          <tr class="divide-x divide-rule">
+            <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Team</th>
+            <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">External ID</th>
+            <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-rule">
+          @for (team of teams(); track team.id) {
+            @if (editingId() === team.id) {
+              <tr class="divide-x divide-rule align-top">
+                <td class="p-2">
+                  <input
+                    formControlName="name"
+                    class="w-full border border-rule bg-paper-2 px-2 py-1.5 text-sm text-ink outline-none focus:border-accent"
+                  />
+                  <input
+                    formControlName="logoUrl"
+                    placeholder="Logo URL"
+                    class="mt-1.5 w-full border border-rule bg-paper-2 px-2 py-1.5 text-sm text-ink outline-none focus:border-accent"
+                  />
+                </td>
+                <td class="p-2">
+                  <input
+                    type="number"
+                    formControlName="externalId"
+                    class="w-24 border border-rule bg-paper-2 px-2 py-1.5 text-sm text-ink outline-none focus:border-accent tnum"
+                  />
+                </td>
+                <td class="p-2">
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      (click)="saveEdit(team)"
+                      [disabled]="editForm.invalid || savingEdit()"
+                      class="border border-accent bg-accent px-3 py-1.5 font-mono text-xs tracking-wide text-accent-ink transition hover:-translate-y-px hover:border-ink hover:bg-ink disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {{ savingEdit() ? 'Saving…' : 'Save' }}
+                    </button>
+                    <button
+                      type="button"
+                      (click)="cancelEditing()"
+                      class="border border-rule px-3 py-1.5 font-mono text-xs text-ink transition-colors hover:border-accent hover:text-accent"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @else {
+              <tr class="divide-x divide-rule">
+                <td class="px-3 py-2.5">
+                  <div class="flex items-center gap-3">
+                    @if (team.logoUrl) {
+                      <img [src]="team.logoUrl" [alt]="team.name" class="h-5 w-5 shrink-0 object-contain" />
+                    }
+                    <span class="font-body text-sm text-ink">{{ team.name }}</span>
+                  </div>
+                </td>
+                <td class="px-3 py-2.5 font-mono text-sm text-muted tnum">{{ team.externalId }}</td>
+                <td class="px-3 py-2.5">
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      (click)="startEditing(team)"
+                      class="border border-rule px-3 py-1.5 font-mono text-xs text-ink transition-colors hover:border-accent hover:text-accent"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      (click)="confirmDelete(team)"
+                      [disabled]="pendingDeleteId() === team.id"
+                      class="border border-rule px-3 py-1.5 font-mono text-xs text-danger transition-colors hover:border-danger disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          } @empty {
+            <tr>
+              <td colspan="3" class="px-3 py-6 text-center font-body text-sm text-muted">
+                {{ loading() ? 'Loading teams…' : 'No teams yet.' }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<app-confirm-modal
+  [open]="deleteTarget() !== null"
+  title="Delete team"
+  [message]="deleteMessage()"
+  confirmLabel="Delete"
+  (confirmed)="deleteConfirmed()"
+  (cancelled)="cancelDelete()"
+/>

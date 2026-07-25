@@ -1,0 +1,146 @@
+<div class="min-h-dvh bg-paper px-6 py-16">
+  <div class="mx-auto flex w-full max-w-4xl flex-col gap-8">
+    <a routerLink="/admin/seasons" class="w-fit font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-accent">&larr; Seasons</a>
+
+    @if (loading()) {
+      <p class="font-body text-muted">Loading season&hellip;</p>
+    } @else if (errorMessage() && !season()) {
+      <p class="font-mono text-sm text-danger">{{ errorMessage() }}</p>
+    } @else if (season(); as detail) {
+      <div class="flex flex-col gap-2 border-b border-rule pb-6">
+        <h1 class="font-display text-3xl font-bold text-ink">
+          {{ detail.startDate | date: 'mediumDate' }} &ndash; {{ detail.endDate | date: 'mediumDate' }}
+        </h1>
+        <p class="font-body text-muted">
+          Matchday {{ detail.currentMatchday }} &middot; {{ detail.isCurrent ? 'Current season' : 'Not current' }}
+        </p>
+      </div>
+
+      <form [formGroup]="addForm" (ngSubmit)="addTeam()" class="flex flex-wrap items-end gap-3 border border-rule bg-paper-2 p-4">
+        <label class="flex flex-col gap-1.5">
+          <span class="font-mono text-xs uppercase tracking-widest text-muted">Championship</span>
+          <select formControlName="leagueId" class="border border-rule bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-accent">
+            <option [ngValue]="0" disabled>Select&hellip;</option>
+            @for (league of leagues(); track league.id) {
+              <option [ngValue]="league.id">{{ league.name }}</option>
+            }
+          </select>
+        </label>
+        <label class="flex flex-col gap-1.5">
+          <span class="font-mono text-xs uppercase tracking-widest text-muted">Team</span>
+          <select formControlName="teamId" class="border border-rule bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-accent">
+            <option [ngValue]="0" disabled>Select&hellip;</option>
+            @for (team of teams(); track team.id) {
+              <option [ngValue]="team.id">{{ team.name }}</option>
+            }
+          </select>
+        </label>
+        <label class="flex flex-col gap-1.5">
+          <span class="font-mono text-xs uppercase tracking-widest text-muted">Position</span>
+          <input type="number" min="1" formControlName="position" class="w-20 border border-rule bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-accent" />
+        </label>
+        <label class="flex flex-col gap-1.5">
+          <span class="font-mono text-xs uppercase tracking-widest text-muted">Played</span>
+          <input type="number" min="0" formControlName="playedGames" class="w-20 border border-rule bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-accent" />
+        </label>
+        <button
+          type="submit"
+          [disabled]="addForm.invalid || adding()"
+          class="border border-accent bg-accent px-4 py-2 font-mono text-sm tracking-wide text-accent-ink transition hover:-translate-y-px hover:border-ink hover:bg-ink disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {{ adding() ? 'Adding…' : 'Add team' }}
+        </button>
+      </form>
+
+      @if (errorMessage()) {
+        <p class="font-mono text-sm text-danger">{{ errorMessage() }}</p>
+      }
+
+      <div class="overflow-x-auto border border-rule">
+        <table class="w-full divide-y divide-rule text-left" [formGroup]="editForm">
+          <thead>
+            <tr class="divide-x divide-rule">
+              <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Team</th>
+              <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Championship</th>
+              <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Position</th>
+              <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Played</th>
+              <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-rule">
+            @for (participation of detail.participations; track participation.id) {
+              @if (editingId() === participation.id) {
+                <tr class="divide-x divide-rule align-top">
+                  <td class="px-3 py-2.5 font-body text-sm text-ink">{{ participation.team.name }}</td>
+                  <td class="px-3 py-2.5 font-body text-sm text-ink">{{ participation.league.name }}</td>
+                  <td class="p-2">
+                    <input type="number" min="1" formControlName="position" class="w-20 border border-rule bg-paper-2 px-2 py-1.5 text-sm text-ink outline-none focus:border-accent" />
+                  </td>
+                  <td class="p-2">
+                    <input type="number" min="0" formControlName="playedGames" class="w-20 border border-rule bg-paper-2 px-2 py-1.5 text-sm text-ink outline-none focus:border-accent" />
+                  </td>
+                  <td class="p-2">
+                    <div class="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        (click)="saveEdit(participation)"
+                        [disabled]="editForm.invalid || savingEdit()"
+                        class="border border-accent bg-accent px-3 py-1.5 font-mono text-xs tracking-wide text-accent-ink transition hover:-translate-y-px hover:border-ink hover:bg-ink disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {{ savingEdit() ? 'Saving…' : 'Save' }}
+                      </button>
+                      <button
+                        type="button"
+                        (click)="cancelEditing()"
+                        class="border border-rule px-3 py-1.5 font-mono text-xs text-ink transition-colors hover:border-accent hover:text-accent"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              } @else {
+                <tr class="divide-x divide-rule">
+                  <td class="px-3 py-2.5">
+                    <div class="flex items-center gap-3">
+                      @if (participation.team.logoUrl) {
+                        <img [src]="participation.team.logoUrl" [alt]="participation.team.name" class="h-5 w-5 shrink-0 object-contain" />
+                      }
+                      <span class="font-body text-sm text-ink">{{ participation.team.name }}</span>
+                    </div>
+                  </td>
+                  <td class="px-3 py-2.5 font-body text-sm text-ink">{{ participation.league.name }}</td>
+                  <td class="px-3 py-2.5 font-mono text-sm text-ink tnum">{{ participation.position }}</td>
+                  <td class="px-3 py-2.5 font-mono text-sm text-ink tnum">{{ participation.playedGames }}</td>
+                  <td class="px-3 py-2.5">
+                    <div class="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        (click)="startEditing(participation)"
+                        class="border border-rule px-3 py-1.5 font-mono text-xs text-ink transition-colors hover:border-accent hover:text-accent"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        (click)="removeParticipation(participation)"
+                        [disabled]="pendingRemoveId() === participation.id"
+                        class="border border-rule px-3 py-1.5 font-mono text-xs text-danger transition-colors hover:border-danger disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            } @empty {
+              <tr>
+                <td colspan="5" class="px-3 py-6 text-center font-body text-sm text-muted">No teams in this season yet.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

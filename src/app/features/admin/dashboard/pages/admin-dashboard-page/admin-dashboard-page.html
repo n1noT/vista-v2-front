@@ -27,14 +27,34 @@
         </div>
       </div>
 
-      <div class="flex items-center justify-between gap-4">
+      <div class="flex flex-wrap items-center justify-between gap-4">
         <h2 class="font-display text-xl font-bold text-ink">Championships</h2>
-        <a
-          routerLink="/admin/users"
-          class="border border-rule px-4 py-2 font-mono text-sm text-ink transition-colors hover:border-accent hover:text-accent"
-        >
-          Manage players
-        </a>
+        <div class="flex flex-wrap gap-3">
+          <a
+            routerLink="/admin/users"
+            class="border border-rule px-4 py-2 font-mono text-sm text-ink transition-colors hover:border-accent hover:text-accent"
+          >
+            Manage players
+          </a>
+          <a
+            routerLink="/admin/teams"
+            class="border border-rule px-4 py-2 font-mono text-sm text-ink transition-colors hover:border-accent hover:text-accent"
+          >
+            Manage teams
+          </a>
+          <a
+            routerLink="/admin/leagues"
+            class="border border-rule px-4 py-2 font-mono text-sm text-ink transition-colors hover:border-accent hover:text-accent"
+          >
+            Manage championships
+          </a>
+          <a
+            routerLink="/admin/seasons"
+            class="border border-rule px-4 py-2 font-mono text-sm text-ink transition-colors hover:border-accent hover:text-accent"
+          >
+            Manage seasons
+          </a>
+        </div>
       </div>
 
       <div class="overflow-x-auto border border-rule">

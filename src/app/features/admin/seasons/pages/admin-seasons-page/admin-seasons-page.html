@@ -1,0 +1,149 @@
+<div class="min-h-dvh bg-paper px-6 py-16">
+  <div class="mx-auto flex w-full max-w-4xl flex-col gap-8">
+    <a routerLink="/admin" class="w-fit font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-accent">&larr; Dashboard</a>
+
+    <div class="flex flex-col gap-2 border-b border-rule pb-6">
+      <h1 class="font-display text-3xl font-bold text-ink">Seasons</h1>
+      <p class="font-body text-muted">Add, edit, or delete a season, and manage which teams participate.</p>
+    </div>
+
+    <form [formGroup]="createForm" (ngSubmit)="createSeason()" class="flex flex-wrap items-end gap-3 border border-rule bg-paper-2 p-4">
+      <label class="flex flex-col gap-1.5">
+        <span class="font-mono text-xs uppercase tracking-widest text-muted">Start date</span>
+        <input type="date" formControlName="startDate" class="border border-rule bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-accent" />
+      </label>
+      <label class="flex flex-col gap-1.5">
+        <span class="font-mono text-xs uppercase tracking-widest text-muted">End date</span>
+        <input type="date" formControlName="endDate" class="border border-rule bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-accent" />
+      </label>
+      <label class="flex flex-col gap-1.5">
+        <span class="font-mono text-xs uppercase tracking-widest text-muted">Matchday</span>
+        <input type="number" min="1" formControlName="currentMatchday" class="w-24 border border-rule bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-accent" />
+      </label>
+      <label class="flex items-center gap-2 pb-2.5">
+        <input type="checkbox" formControlName="isCurrent" class="h-4 w-4 border-rule accent-accent" />
+        <span class="font-mono text-xs uppercase tracking-widest text-muted">Current</span>
+      </label>
+      <button
+        type="submit"
+        [disabled]="createForm.invalid || creating()"
+        class="border border-accent bg-accent px-4 py-2 font-mono text-sm tracking-wide text-accent-ink transition hover:-translate-y-px hover:border-ink hover:bg-ink disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {{ creating() ? 'Adding…' : 'Add season' }}
+      </button>
+    </form>
+
+    @if (errorMessage()) {
+      <p class="font-mono text-sm text-danger">{{ errorMessage() }}</p>
+    }
+
+    <div class="overflow-x-auto border border-rule">
+      <table class="w-full divide-y divide-rule text-left" [formGroup]="editForm">
+        <thead>
+          <tr class="divide-x divide-rule">
+            <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Window</th>
+            <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Matchday</th>
+            <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Current</th>
+            <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">External ID</th>
+            <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-rule">
+          @for (season of seasons(); track season.id) {
+            @if (editingId() === season.id) {
+              <tr class="divide-x divide-rule align-top">
+                <td class="flex flex-col gap-1.5 p-2">
+                  <input type="date" formControlName="startDate" class="border border-rule bg-paper-2 px-2 py-1.5 text-sm text-ink outline-none focus:border-accent" />
+                  <input type="date" formControlName="endDate" class="border border-rule bg-paper-2 px-2 py-1.5 text-sm text-ink outline-none focus:border-accent" />
+                </td>
+                <td class="p-2">
+                  <input type="number" min="1" formControlName="currentMatchday" class="w-20 border border-rule bg-paper-2 px-2 py-1.5 text-sm text-ink outline-none focus:border-accent" />
+                </td>
+                <td class="px-3 py-2.5">
+                  <input type="checkbox" formControlName="isCurrent" class="h-4 w-4 border-rule accent-accent" />
+                </td>
+                <td class="p-2">
+                  <input
+                    type="number"
+                    formControlName="externalId"
+                    class="w-24 border border-rule bg-paper-2 px-2 py-1.5 text-sm text-ink outline-none focus:border-accent tnum"
+                  />
+                </td>
+                <td class="p-2">
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      (click)="saveEdit(season)"
+                      [disabled]="editForm.invalid || savingEdit()"
+                      class="border border-accent bg-accent px-3 py-1.5 font-mono text-xs tracking-wide text-accent-ink transition hover:-translate-y-px hover:border-ink hover:bg-ink disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {{ savingEdit() ? 'Saving…' : 'Save' }}
+                    </button>
+                    <button
+                      type="button"
+                      (click)="cancelEditing()"
+                      class="border border-rule px-3 py-1.5 font-mono text-xs text-ink transition-colors hover:border-accent hover:text-accent"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @else {
+              <tr class="divide-x divide-rule">
+                <td class="px-3 py-2.5 font-body text-sm text-ink">
+                  {{ season.startDate | date: 'mediumDate' }} &ndash; {{ season.endDate | date: 'mediumDate' }}
+                </td>
+                <td class="px-3 py-2.5 font-mono text-sm text-ink tnum">{{ season.currentMatchday }}</td>
+                <td class="px-3 py-2.5 font-mono text-sm" [class]="season.isCurrent ? 'text-accent' : 'text-muted'">
+                  {{ season.isCurrent ? 'Yes' : 'No' }}
+                </td>
+                <td class="px-3 py-2.5 font-mono text-sm text-muted tnum">{{ season.externalId }}</td>
+                <td class="px-3 py-2.5">
+                  <div class="flex flex-wrap gap-2">
+                    <a
+                      [routerLink]="['/admin', 'seasons', season.id]"
+                      class="border border-rule px-3 py-1.5 font-mono text-xs text-ink transition-colors hover:border-accent hover:text-accent"
+                    >
+                      Manage teams
+                    </a>
+                    <button
+                      type="button"
+                      (click)="startEditing(season)"
+                      class="border border-rule px-3 py-1.5 font-mono text-xs text-ink transition-colors hover:border-accent hover:text-accent"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      (click)="confirmDelete(season)"
+                      [disabled]="pendingDeleteId() === season.id"
+                      class="border border-rule px-3 py-1.5 font-mono text-xs text-danger transition-colors hover:border-danger disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          } @empty {
+            <tr>
+              <td colspan="5" class="px-3 py-6 text-center font-body text-sm text-muted">
+                {{ loading() ? 'Loading seasons…' : 'No seasons yet.' }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<app-confirm-modal
+  [open]="deleteTarget() !== null"
+  title="Delete season"
+  [message]="deleteMessage()"
+  confirmLabel="Delete"
+  (confirmed)="deleteConfirmed()"
+  (cancelled)="cancelDelete()"
+/>

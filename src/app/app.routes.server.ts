@@ -18,6 +18,11 @@ export const serverRoutes: ServerRoute[] = [
     path: 'admin/users/:userId/predictions/league/:leagueId',
     renderMode: RenderMode.Client
   },
+  // Same reasoning — no fixed set of `:id`s to prerender.
+  {
+    path: 'admin/seasons/:id',
+    renderMode: RenderMode.Client
+  },
   {
     path: '**',
     renderMode: RenderMode.Prerender

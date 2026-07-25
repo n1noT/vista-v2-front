@@ -1,8 +1,9 @@
 /**
  * `/admin` (guarded by `adminGuard` — see `admin.routes.ts`). The
  * `/admin/dashboard` overview from `Arborescence_Pages.md`: player counts
- * and per-championship season status, plus a link into `/admin/users` for
- * the players-management actions (ban/edit/delete) that live there.
+ * and per-championship season status, plus links into `/admin/users`,
+ * `/admin/teams`, `/admin/leagues`, and `/admin/seasons` for the actual
+ * management actions that live on those pages.
  */
 import { Component, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
