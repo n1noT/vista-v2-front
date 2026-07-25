@@ -53,6 +53,11 @@
             <span class="h-5 w-5 shrink-0 border border-rule"></span>
           }
           <span class="font-body text-sm text-ink">{{ team.name }}</span>
+          @if (placementPreview(team, i); as preview) {
+            <span [class]="'ml-auto shrink-0 border border-rule px-2 py-0.5 font-mono text-xs text-ink tnum ' + preview.riskClass">
+              {{ preview.points }} pts
+            </span>
+          }
         </li>
       } @empty {
         <li class="px-3 py-4 font-body text-sm text-muted">Drag teams here to rank them.</li>

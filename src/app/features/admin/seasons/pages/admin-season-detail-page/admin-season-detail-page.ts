@@ -7,19 +7,31 @@
  * team picker (`AdminTeamsService`, reused as-is from the teams admin
  * feature) — there's no separate league to pick per participation anymore.
  *
- * Removing a participation (and editing its position/played games) is
- * instant, no confirmation — it's reversible (re-add the same team) and
- * only affects standings-prediction seed data, not player predictions
- * themselves (`PredictionItem.teamId` references `Team` directly, not this
- * join row).
+ * The edit row also sets `expectedPosition` ("F" from `Calcul_Cotes.md`,
+ * the bookmaker-expected position `AdminResultsService` scores predictions
+ * against). It's optional and left blank by default (not every team has
+ * odds set yet) — only submitted when non-null, via a second call to
+ * `AdminOddsService.updateExpectedPosition` (a distinct API resource from
+ * `AdminSeasonsService.updateParticipation`, matching the API's
+ * `admin/odds/` vs `admin/seasons/` module split). The two calls run
+ * sequentially (not `forkJoin`) so the merged result always reflects both
+ * writes rather than a race between them.
+ *
+ * Removing a participation (and editing its position/played games/odds) is
+ * instant, no confirmation — it's reversible (re-add the same team, or
+ * re-edit the odds) and only affects standings-prediction seed data, not
+ * player predictions themselves (`PredictionItem.teamId` references `Team`
+ * directly, not this join row).
  */
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
+import { map, of, switchMap } from 'rxjs';
 import { AdminSeasonsService } from '../../admin-seasons.service';
 import { AdminTeamsService } from '../../../teams/admin-teams.service';
+import { AdminOddsService } from '../../../odds/admin-odds.service';
 import { Participation, SeasonDetail } from '../../season.model';
 import { Team } from '../../../teams/team.model';
 
@@ -33,6 +45,7 @@ export class AdminSeasonDetailPage {
   private readonly route = inject(ActivatedRoute);
   private readonly adminSeasonsService = inject(AdminSeasonsService);
   private readonly adminTeamsService = inject(AdminTeamsService);
+  private readonly adminOddsService = inject(AdminOddsService);
 
   protected readonly seasonId = Number(this.route.snapshot.paramMap.get('id'));
   protected readonly season = signal<SeasonDetail | null>(null);
@@ -49,9 +62,12 @@ export class AdminSeasonDetailPage {
 
   protected readonly editingId = signal<number | null>(null);
   protected readonly savingEdit = signal(false);
-  protected readonly editForm = this.fb.nonNullable.group({
-    position: [1, [Validators.required, Validators.min(1)]],
-    playedGames: [0, [Validators.required, Validators.min(0)]],
+  protected readonly editForm = this.fb.group({
+    position: this.fb.nonNullable.control(1, [Validators.required, Validators.min(1)]),
+    playedGames: this.fb.nonNullable.control(0, [Validators.required, Validators.min(0)]),
+    // Optional — left null when a team's odds haven't been set yet; only
+    // sent to `AdminOddsService` when the admin actually fills it in.
+    expectedPosition: this.fb.control<number | null>(null, [Validators.min(1)]),
   });
 
   protected readonly pendingRemoveId = signal<number | null>(null);
@@ -85,7 +101,11 @@ export class AdminSeasonDetailPage {
   protected startEditing(participation: Participation): void {
     this.errorMessage.set(null);
     this.editingId.set(participation.id);
-    this.editForm.setValue({ position: participation.position, playedGames: participation.playedGames });
+    this.editForm.setValue({
+      position: participation.position,
+      playedGames: participation.playedGames,
+      expectedPosition: participation.expectedPosition,
+    });
   }
 
   protected cancelEditing(): void {
@@ -99,8 +119,19 @@ export class AdminSeasonDetailPage {
     this.savingEdit.set(true);
     this.errorMessage.set(null);
 
+    const { position, playedGames, expectedPosition } = this.editForm.getRawValue();
+
     this.adminSeasonsService
-      .updateParticipation(this.seasonId, participation.id, this.editForm.getRawValue())
+      .updateParticipation(this.seasonId, participation.id, { position, playedGames })
+      .pipe(
+        switchMap((updated) =>
+          expectedPosition === null
+            ? of(updated)
+            : this.adminOddsService
+                .updateExpectedPosition(participation.id, expectedPosition)
+                .pipe(map((odds) => ({ ...updated, expectedPosition: odds.expectedPosition }))),
+        ),
+      )
       .subscribe({
         next: (updated) => {
           this.season.update((detail) =>

@@ -20,6 +20,14 @@
   --color-focus:      oklch(55% 0.17 235);
   --color-danger:     oklch(55% 0.18 25);
 
+  /* Potential-points risk badges (DraggableLeagueTable) — a yellow→green
+   * "opportunity" gradient, not a danger one: low risk (guess near the
+   * bookmaker's expected position) reads calm, high risk (a bold guess with
+   * a bigger payoff) reads vivid. */
+  --color-risk-low:  oklch(90% 0.06 95);
+  --color-risk-mid:  oklch(92% 0.05 150);
+  --color-risk-high: oklch(80% 0.14 150);
+
   --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
   --font-body:    "Newsreader", ui-serif, Georgia, serif;
   --font-mono:    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
@@ -68,6 +76,9 @@
     --color-accent-ink: oklch(16% 0.012 235);
     --color-focus:      oklch(78% 0.15 235);
     --color-danger:     oklch(72% 0.16 25);
+    --color-risk-low:  oklch(35% 0.08 95);
+    --color-risk-mid:  oklch(32% 0.07 150);
+    --color-risk-high: oklch(45% 0.14 150);
   }
 }
 :root[data-theme="dark"] {
@@ -81,6 +92,9 @@
   --color-accent-ink: oklch(16% 0.012 235);
   --color-focus:      oklch(78% 0.15 235);
   --color-danger:     oklch(72% 0.16 25);
+  --color-risk-low:  oklch(35% 0.08 95);
+  --color-risk-mid:  oklch(32% 0.07 150);
+  --color-risk-high: oklch(45% 0.14 150);
 }
 :root[data-theme="light"] {
   --color-paper:      oklch(97% 0.008 230);
@@ -93,6 +107,9 @@
   --color-accent-ink: oklch(98% 0.010 235);
   --color-focus:      oklch(55% 0.17 235);
   --color-danger:     oklch(55% 0.18 25);
+  --color-risk-low:  oklch(90% 0.06 95);
+  --color-risk-mid:  oklch(92% 0.05 150);
+  --color-risk-high: oklch(80% 0.14 150);
 }
 
 html {

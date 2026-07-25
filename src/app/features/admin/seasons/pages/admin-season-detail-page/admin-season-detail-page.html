@@ -58,6 +58,7 @@
               <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Team</th>
               <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Position</th>
               <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Played</th>
+              <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Odds (F)</th>
               <th class="px-3 py-2.5 font-mono text-xs uppercase tracking-widest text-muted">Actions</th>
             </tr>
           </thead>
@@ -71,6 +72,16 @@
                   </td>
                   <td class="p-2">
                     <input type="number" min="0" formControlName="playedGames" class="w-20 border border-rule bg-paper-2 px-2 py-1.5 text-sm text-ink outline-none focus:border-accent" />
+                  </td>
+                  <td class="p-2">
+                    <input
+                      type="number"
+                      min="1"
+                      step="any"
+                      placeholder="Not set"
+                      formControlName="expectedPosition"
+                      class="w-24 border border-rule bg-paper-2 px-2 py-1.5 text-sm text-ink outline-none focus:border-accent"
+                    />
                   </td>
                   <td class="p-2">
                     <div class="flex flex-wrap gap-2">
@@ -104,6 +115,9 @@
                   </td>
                   <td class="px-3 py-2.5 font-mono text-sm text-ink tnum">{{ participation.position }}</td>
                   <td class="px-3 py-2.5 font-mono text-sm text-ink tnum">{{ participation.playedGames }}</td>
+                  <td class="px-3 py-2.5 font-mono text-sm tnum" [class.text-muted]="participation.expectedPosition === null" [class.text-ink]="participation.expectedPosition !== null">
+                    {{ participation.expectedPosition ?? 'Not set' }}
+                  </td>
                   <td class="px-3 py-2.5">
                     <div class="flex flex-wrap gap-2">
                       <button
@@ -127,7 +141,7 @@
               }
             } @empty {
               <tr>
-                <td colspan="4" class="px-3 py-6 text-center font-body text-sm text-muted">No teams in this season yet.</td>
+                <td colspan="5" class="px-3 py-6 text-center font-body text-sm text-muted">No teams in this season yet.</td>
               </tr>
             }
           </tbody>

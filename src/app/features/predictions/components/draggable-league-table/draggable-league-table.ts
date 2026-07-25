@@ -25,13 +25,19 @@
  * other case (deadline passed on an incomplete prediction), where the pool
  * still has content worth showing.
  *
- * The spec also calls for an odds ("cote") column per position; that needs
- * the odds engine from `Calcul_Cotes.md`, not modeled in the schema yet, so
- * it's omitted here until that data exists.
+ * Each ranked row also shows a potential-points badge, via the shared
+ * `placementPreview` util (see its header comment for the formula) — the
+ * points the player would get if this placement turns out exactly right.
+ * `null` when a team has no `expectedPosition` set yet — no badge, not a
+ * fake number. The unranked pool never shows this since those teams have
+ * no position. `ChampionshipPredictionPage` uses the same util to total
+ * these badges into a header summary, hence it living outside this
+ * component rather than as a private method here.
  */
 import { Component, effect, input, model, signal } from '@angular/core';
 import { CdkDropList, CdkDrag, CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { LeagueTeamStanding } from '../../league-detail.model';
+import { placementPreview } from '../../potential-points.util';
 
 @Component({
   selector: 'app-draggable-league-table',
@@ -72,6 +78,10 @@ export class DraggableLeagueTable {
     transferArrayItem(rankedNext, poolNext, event.previousIndex, event.currentIndex);
     this.pool.set(poolNext);
     this.ranked.set(rankedNext);
+  }
+
+  protected placementPreview(team: LeagueTeamStanding, index: number) {
+    return placementPreview(team.expectedPosition, index + 1, this.allTeams().length);
   }
 
   protected dropOnRanked(event: CdkDragDrop<LeagueTeamStanding[]>): void {

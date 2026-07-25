@@ -8,7 +8,10 @@
  * scoped to one competition. `Participation` is a `TeamLeagueSeason` row
  * with its `team` included, as returned by `GET /admin/seasons/:id` and the
  * add/update-participation endpoints — it has no `league` of its own since
- * that's implied by the season it belongs to.
+ * that's implied by the season it belongs to. `expectedPosition` ("F" from
+ * `Calcul_Cotes.md`) is edited via the separate `/admin/odds` endpoint
+ * (`AdminOddsService`), not `UpdateParticipationPayload` — see
+ * `admin-season-detail-page.ts`'s header comment.
  */
 export interface Season {
   id: number;
@@ -27,6 +30,7 @@ export interface Participation {
   seasonId: number;
   position: number;
   playedGames: number;
+  expectedPosition: number | null;
   team: { id: number; name: string; logoUrl: string | null };
 }
 

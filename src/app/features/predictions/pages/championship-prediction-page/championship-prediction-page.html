@@ -18,6 +18,7 @@
           <h1 class="font-display text-3xl font-bold text-ink">{{ detail.leagueName }}</h1>
         </div>
         <p class="font-body text-muted">Drag teams from the unranked list into your prediction, 1st to {{ detail.teams.length }}th.</p>
+        <p class="font-mono text-sm text-ink">Total potential points: <span class="tnum">{{ totalPotentialPoints() }}</span></p>
       </div>
 
       @if (readOnly()) {

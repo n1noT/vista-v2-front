@@ -18,6 +18,11 @@
  * `/predictions/league/1` → `/predictions/league/2` navigations —
  * only params change, the component instance doesn't get recreated.
  *
+ * The header also shows `totalPotentialPoints`, a live sum of the
+ * per-row potential-points badges `DraggableLeagueTable` renders (shared
+ * math in `potential-points.util.ts`) — the ceiling score for the current
+ * arrangement, updating as the player drags teams around.
+ *
  * `readOnly` (passed to `DraggableLeagueTable`) is `true` once the
  * prediction is `SUBMITTED` or the season's `startDate` has passed — per
  * `Fonctionnalites_Joueurs.md`, unsubmitted predictions auto-submit at that
@@ -40,6 +45,7 @@ import { LeagueDetail, LeagueTeamStanding } from '../../league-detail.model';
 import { CUPredictionsPayload, Prediction } from '../../prediction.model';
 import { DraggableLeagueTable } from '../../components/draggable-league-table/draggable-league-table';
 import { ConfirmModal } from '../../../../shared/components/confirm-modal/confirm-modal';
+import { placementPreview } from '../../potential-points.util';
 
 @Component({
   selector: 'app-championship-prediction-page',
@@ -76,6 +82,25 @@ export class ChampionshipPredictionPage {
   protected readonly isComplete = computed(() => {
     const detail = this.leagueDetail();
     return detail !== null && this.teams().length === detail.teams.length;
+  });
+
+  /**
+   * Sum of every currently-ranked row's potential-points badge (see
+   * `potential-points.util.ts`) — the total the player would score if this
+   * exact arrangement turns out exactly right. Recomputes live as teams are
+   * dragged; teams with no `expectedPosition` set contribute 0, same as
+   * showing no badge for them in `DraggableLeagueTable`.
+   */
+  protected readonly totalPotentialPoints = computed(() => {
+    const detail = this.leagueDetail();
+    if (!detail) {
+      return 0;
+    }
+    const teamCount = detail.teams.length;
+    return this.teams().reduce(
+      (sum, team, index) => sum + (placementPreview(team.expectedPosition, index + 1, teamCount)?.points ?? 0),
+      0,
+    );
   });
 
   constructor() {
