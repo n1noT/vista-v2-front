@@ -12,13 +12,12 @@
  * until that daily sync has run at least once. Each entry's
  * `predictionStatus` (`NOT_STARTED`/`DRAFT`/`SUBMITTED`) is rendered as a
  * badge so a player can see at a glance which championships they've already
- * locked in. The Champions League entries are rendered as static links:
+ * locked in. The Champions League entries aren't backed by anything yet —
  * the schema deliberately doesn't model CL standings yet (see
- * `football-sync/constants.ts`), so there's no equivalent endpoint for them.
- *
- * None of the destination pages exist yet (see CLAUDE.md "Known issues") —
- * the links are wired per the documented sitemap so they start working the
- * moment those routes land, with no changes needed here.
+ * `football-sync/constants.ts`), and their destination routes
+ * (`/predictions/ldc/phase-ligue|phase-finale`) aren't registered in
+ * `predictions.routes.ts` — so they're rendered as disabled, non-navigating
+ * rows with a "Work in progress" badge rather than dead `routerLink`s.
  */
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
