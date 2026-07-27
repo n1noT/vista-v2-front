@@ -1,0 +1,81 @@
+<div class="min-h-dvh bg-paper px-6 py-16">
+  <div class="mx-auto flex w-full max-w-2xl flex-col gap-10">
+    <div class="flex items-center justify-between">
+      <a routerLink="/leaderboard" class="w-fit font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-accent">&larr; Leaderboard</a>
+      <a routerLink="/profile" class="w-fit font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-accent">My profile</a>
+    </div>
+
+    @if (loading()) {
+      <p class="font-body text-muted">Loading profile&hellip;</p>
+    } @else if (errorMessage()) {
+      <p class="font-mono text-sm text-danger">{{ errorMessage() }}</p>
+    } @else if (profile(); as p) {
+      <div class="flex items-center gap-4 border-b border-rule pb-6">
+        @if (p.avatarUrl) {
+          <img [src]="p.avatarUrl" [alt]="p.pseudo" class="h-14 w-14 border border-rule object-cover" />
+        } @else {
+          <div class="flex h-14 w-14 items-center justify-center border border-rule bg-paper-2 font-display text-xl text-ink">
+            {{ p.pseudo.charAt(0).toUpperCase() }}
+          </div>
+        }
+        <div class="flex flex-col gap-1">
+          <h1 class="font-display text-3xl font-bold text-ink">{{ p.pseudo }}</h1>
+          <p class="font-mono text-xs uppercase tracking-widest text-muted">Member since {{ p.createdAt | date: 'longDate' }}</p>
+        </div>
+      </div>
+
+      <section class="flex flex-col gap-4">
+        <h2 class="font-mono text-xs uppercase tracking-widest text-muted">Championship predictions</h2>
+
+        @if (leagues() === null || leagues()!.length === 0) {
+          <p class="font-body text-muted">No championship is open for predictions yet.</p>
+        } @else {
+          <ul class="flex flex-col gap-4">
+            @for (league of leagues(); track league.leagueId) {
+              <li class="border border-rule">
+                <div class="flex items-center justify-between gap-4 border-b border-rule bg-paper-2 px-4 py-3">
+                  <span class="flex items-center gap-3">
+                    @if (league.leagueLogoUrl) {
+                      <img [src]="league.leagueLogoUrl" [alt]="league.leagueName" class="h-5 w-5 object-contain" />
+                    }
+                    <span class="font-body text-ink">{{ league.leagueName }}</span>
+                  </span>
+                  @if (league.visible && league.totalPoints !== null) {
+                    <span class="font-mono text-xs uppercase tracking-widest text-accent tnum">{{ league.totalPoints }} pts</span>
+                  }
+                </div>
+
+                @if (league.visible && league.items) {
+                  <ol class="flex flex-col divide-y divide-rule">
+                    @for (team of league.items; track team.teamId) {
+                      <li class="flex items-center justify-between gap-4 px-4 py-2.5">
+                        <span class="flex items-center gap-3">
+                          <span class="font-mono text-xs text-muted tnum">{{ team.position }}</span>
+                          @if (team.logoUrl) {
+                            <img [src]="team.logoUrl" [alt]="team.name" class="h-5 w-5 object-contain" />
+                          }
+                          <span class="font-body text-sm text-ink">{{ team.name }}</span>
+                        </span>
+                        @if (team.points !== null) {
+                          <span class="font-mono text-xs text-muted tnum">{{ team.points }} pts</span>
+                        }
+                      </li>
+                    }
+                  </ol>
+                } @else if (!league.targetSubmitted) {
+                  <p class="px-4 py-3 font-body text-sm text-muted">{{ profile()?.pseudo }} hasn't submitted a prediction for this championship yet.</p>
+                } @else {
+                  <p class="px-4 py-3 font-body text-sm text-muted">
+                    Submit your own
+                    <a [routerLink]="['/predictions/league', league.leagueId]" class="border-b border-rule text-ink transition-colors hover:border-accent hover:text-accent">{{ league.leagueName }}</a>
+                    prediction to unlock {{ profile()?.pseudo }}'s.
+                  </p>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    }
+  </div>
+</div>

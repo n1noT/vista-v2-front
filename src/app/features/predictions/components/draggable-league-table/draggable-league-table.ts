@@ -33,6 +33,13 @@
  * no position. `ChampionshipPredictionPage` uses the same util to total
  * these badges into a header summary, hence it living outside this
  * component rather than as a private method here.
+ *
+ * `showRealPosition` additionally renders each ranked row's true/live
+ * standing (`team.position`, from `TeamLeagueSeason.position` — kept fresh
+ * by the daily football-data sync) next to the guessed slot, so a player can
+ * see how their locked-in prediction compares to reality. The parent passes
+ * `true` only once `SUBMITTED` (same condition as `hidePool`) — before that,
+ * the ranking is still just the player's own guess, not yet worth comparing.
  */
 import { Component, effect, input, model, signal } from '@angular/core';
 import { CdkDropList, CdkDrag, CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
@@ -49,6 +56,7 @@ export class DraggableLeagueTable {
   readonly ranked = model.required<LeagueTeamStanding[]>();
   readonly readOnly = input(false);
   readonly hidePool = input(false);
+  readonly showRealPosition = input(false);
 
   protected readonly pool = signal<LeagueTeamStanding[]>([]);
 

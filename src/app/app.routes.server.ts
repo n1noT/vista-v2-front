@@ -8,6 +8,11 @@ export const serverRoutes: ServerRoute[] = [
     path: 'predictions/league/:id',
     renderMode: RenderMode.Client
   },
+  // Same reasoning — no fixed set of player `:id`s to prerender.
+  {
+    path: 'profile/:id',
+    renderMode: RenderMode.Client
+  },
   // Same reasoning as above, for the admin per-player prediction routes —
   // no fixed set of `:userId`/`:leagueId`s to prerender.
   {

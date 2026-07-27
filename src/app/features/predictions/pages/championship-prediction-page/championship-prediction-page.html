@@ -36,6 +36,7 @@
         [(ranked)]="teams"
         [readOnly]="readOnly()"
         [hidePool]="prediction()?.status === 'SUBMITTED'"
+        [showRealPosition]="prediction()?.status === 'SUBMITTED'"
       />
 
       @if (statusMessage()) {

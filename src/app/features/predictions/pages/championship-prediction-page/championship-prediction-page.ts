@@ -33,6 +33,10 @@
  * `ConfirmModal` guard before calling it — clicking the button only opens
  * the modal (`showSubmitConfirm`), the actual `POST /predictions/submit`
  * fires from `confirmSubmit()` once the player confirms in it.
+ *
+ * `showRealPosition` is passed to `DraggableLeagueTable` under the same
+ * `SUBMITTED`-only condition as `hidePool`, so a locked-in prediction shows
+ * each team's true/live standing next to its guessed slot.
  */
 import { Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
