@@ -8,7 +8,10 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:e2e": "playwright test",
-    "serve:ssr:vista-v2-front": "node dist/vista-v2-front/server/server.mjs"
+    "serve:ssr:vista-v2-front": "node dist/vista-v2-front/server/server.mjs",
+    "deploy": "npm run build && wrangler deploy",
+    "preview": "npm run build && wrangler dev",
+    "cf-typegen": "wrangler types"
   },
   "private": true,
   "packageManager": "npm@11.12.1",
@@ -39,6 +42,8 @@
     "prettier": "^3.8.1",
     "tailwindcss": "^4.1.12",
     "typescript": "~5.9.2",
-    "vitest": "^4.0.8"
+    "vitest": "^4.0.8",
+    "wrangler": "^4.114.0",
+    "xhr2": "^0.2.1"
   }
 }
