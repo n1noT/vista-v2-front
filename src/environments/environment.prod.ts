@@ -8,5 +8,5 @@
  */
 export const environment = {
   production: true,
-  apiUrl: 'https://api.vista.example.com',
+  apiUrl: 'https://api.vista-predi.fr',
 };
